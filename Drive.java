@@ -60,8 +60,40 @@ public class Drive extends Subsystem {
      * @param turn The twist power
      */
     public void updateSpeeds(double forward, double turn){
-        this.forward = forward;
-        this.turn = turn;
+
+        double forwardChange, turnChange;
+        forwardChange = calculateIncrease(forward);
+        turnChange = calculateIncrease(turn);
+
+        // Flip the signs so the power creeps down
+        if (Math.abs(forwardChange) < Math.abs(this.forward)) {
+            if (forwardChange > this.forward) {
+                forwardChange *= -1.0;
+            }
+            if (forwardChange == 0) {
+                forwardChange = this.forward / 1.1125;
+            }
+        }
+
+        if(Math.abs(turnChange) < Math.abs(this.turn)){
+            if(turnChange > this.turn){
+                turnChange *= -1;
+            }
+            if(turnChange == 0){
+                turnChange = this.turn / 1.1125;
+            }
+        }
+
+        this.forward += forwardChange;
+        this.turn += turnChange;
+
+    }
+
+    private double calculateIncrease(double input){
+        if(overCurrent()){
+            return input >= 0 ? -0.01 : 0.01; //TODO Actually implement a rampdown for current limiting
+        }
+        return Math.pow(input, 3)/4;
     }
 
     /**

@@ -67,9 +67,6 @@ public class Robot extends TimedRobot {
 
         //shift.setInHighGear(toggle.update(dRB));
 
-        if(drive.overCurrent()){
-            //driver.decrementPower();
-        }
         drive.updateSpeeds(driver.getForward(), driver.getTurn());
     }
 
