@@ -69,8 +69,8 @@ public class Subsystem implements Runnable {
      * THIS METHOD SHOULD BE OVERRIDDEN
      */
     protected void actions() {
-        System.out.println("***WARNING***");
-        System.out.println("actions() function has not been overridden");
+        System.err.println("***WARNING***");
+        System.err.println("actions() function has not been overridden");
     }
 
     /**
@@ -78,8 +78,8 @@ public class Subsystem implements Runnable {
      * THIS METHOD SHOULD BE OVERRIDDEN
      */
     protected void haltSystem(){
-        System.out.println("***WARNING***");
-        System.out.println("haltSystem() function has not been overridden");
+        System.err.println("***WARNING***");
+        System.err.println("haltSystem() function has not been overridden");
     }
 
 }
