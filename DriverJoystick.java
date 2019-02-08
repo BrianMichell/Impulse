@@ -11,7 +11,7 @@ public class DriverJoystick implements Runnable {
     private final int LEFT_Y = 1;
     private final int RIGHT_X = 4;
 
-    private double appliedPower[] = { 0, 0 };
+    public static double appliedPower[] = { 0, 0 };
 
     public XboxController joystick;
 
@@ -62,7 +62,7 @@ public class DriverJoystick implements Runnable {
      * @return Returns the calculated forward power (This will differ from the raw
      *         value)
      */
-    public double getForward() {
+    public static double getForward() {
         return appliedPower[0];
     }
 
@@ -70,7 +70,7 @@ public class DriverJoystick implements Runnable {
      * @return Returns the calculated turn power (This will differ from the raw
      *         value)
      */
-    public double getTurn() {
+    public static double getTurn() {
         return appliedPower[1];
     }
 

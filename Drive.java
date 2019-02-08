@@ -26,7 +26,12 @@ public class Drive extends Subsystem {
 
     @Override
     protected void actions() {
+        double forward = DriverJoystick.getForward();
+        double turn = DriverJoystick.getTurn();
+        updateSpeeds(forward, turn);
         this.drive.arcadeDrive(forward,turn);
+        SmartDashboard.putNumber("Forward speed", this.forward);
+        SmartDashboard.putNumber("Turn speed", this.turn);
     }
 
     @Override
@@ -51,6 +56,12 @@ public class Drive extends Subsystem {
             maxDraw = ret;
         }
         SmartDashboard.putNumber("Max current", maxDraw);
+        SmartDashboard.putNumber("Left 1", this.pdp.getCurrent((int)00f));
+        SmartDashboard.putNumber("Left 2", this.pdp.getCurrent(0b1));
+        SmartDashboard.putNumber("Left 3", this.pdp.getCurrent(0b11));
+        SmartDashboard.putNumber("Right 1", this.pdp.getCurrent(0b1100));
+        SmartDashboard.putNumber("Right 2", this.pdp.getCurrent(0b1110));
+        SmartDashboard.putNumber("Right 3", this.pdp.getCurrent(0x00F));
         return ret;
     }
 
@@ -86,6 +97,13 @@ public class Drive extends Subsystem {
 
         this.forward += forwardChange;
         this.turn += turnChange;
+        if(Math.abs(this.forward) > Math.abs(forward)){
+            this.forward = forward;
+        }
+        if(Math.abs(this.turn) > Math.abs(turn)){
+            this.turn = turn;
+        }
+
 
     }
 
