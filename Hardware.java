@@ -23,35 +23,51 @@ public interface Hardware {
 
 public class Hardware {
 
-    //Motors
-    //public final SpeedControllerGroup leftDrive = new SpeedControllerGroup(new Victor(2), new Victor(3));
-    //public final SpeedControllerGroup rightDrive =  new SpeedControllerGroup(new Victor(0), new Victor(1));
-    public final Talon leftDrive = new Talon(0);
-    public final Talon rightDrive = new Talon(1);
-    public final DifferentialDrive drive = new DifferentialDrive(leftDrive, rightDrive);
-    public final Victor thetaOne = new Victor(4);
-    public final Victor thetaTwo = new Victor(5);
-    public final Victor phiOne = new Victor(6);
-    public final Victor phiTwo = new Victor(7);
+    // Motors
+    // public final SpeedControllerGroup leftDrive = new SpeedControllerGroup(new
+    // Victor(2), new Victor(3));
+    // public final SpeedControllerGroup rightDrive = new SpeedControllerGroup(new
+    // Victor(0), new Victor(1));
+    public final Talon leftDrive, rightDrive;
+    public final DifferentialDrive drive;
+    public final Victor thetaOne, thetaTwo, phiOne, phiTwo;
+
+    // Pneumatics
+    // public final Compressor compressor = new Compressor();
+    // public final DoubleSolenoid leftShift = new DoubleSolenoid(0, 1);
+    // public final DoubleSolenoid rightShift = new DoubleSolenoid(2, 3);
+
+    // Encoders
+    public final Encoder encoderTheta, encoderPhi;
     
-    //Pneumatics
-    //public final Compressor compressor = new Compressor();
-    //public final DoubleSolenoid leftShift = new DoubleSolenoid(0, 1);
-    //public final DoubleSolenoid rightShift = new DoubleSolenoid(2, 3);
-    
-    //Sensors
-    public final Encoder encoderTheta = new Encoder(0, 1);
-    public final Encoder encoderPhi = new Encoder(2, 3);
-    public final BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
-    public final PowerDistributionPanel pdp = new PowerDistributionPanel(0);
+    // Sensors
+    public final BuiltInAccelerometer accelerometer;
+    public final PowerDistributionPanel pdp;
 
-
-    protected final int[] MOTORS = {0, 1, 2, 15, 14, 13};
-
+    protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
 
     public Hardware() {
-        this.thetaTwo.setInverted(true);
-        this.phiTwo.setInverted(true);
+        // Motors
+        leftDrive = new Talon(0);
+        rightDrive = new Talon(1);
+
+        drive = new DifferentialDrive(leftDrive, rightDrive);
+
+        thetaOne = new Victor(4);
+        thetaTwo = new Victor(5);
+        phiOne = new Victor(6);
+        phiTwo = new Victor(7);
+
+        // Encoders
+        encoderTheta = new Encoder(0, 1);
+        encoderPhi = new Encoder(2, 3);
+
+        // Sensors
+        accelerometer = new BuiltInAccelerometer();
+        pdp = new PowerDistributionPanel(0);
+
+        thetaTwo.setInverted(true);
+        phiTwo.setInverted(true);
     }
 
 }
