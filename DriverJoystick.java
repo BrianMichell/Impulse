@@ -31,8 +31,8 @@ public class DriverJoystick implements Runnable {
 
         while (!Thread.interrupted()) {
            
-            appliedPower[0] = deadzone(joystick.getRawAxis(LEFT_Y));
-            appliedPower[1] = deadzone(-joystick.getRawAxis(RIGHT_X)); // Values on the X axis must be inverted
+            appliedPower[0] = deadzone(-joystick.getRawAxis(LEFT_Y));
+            appliedPower[1] = deadzone(joystick.getRawAxis(RIGHT_X)); // Values on the X axis must be inverted
 
             Timer.delay(0.005);
         }
