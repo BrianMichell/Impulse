@@ -11,16 +11,17 @@ class EnergyLogger implements Runnable {
     Drive drive;
     boolean errorWriting;
 
-    private int status;
-    private final int ENABLED = 1;
-    private final int DISABLED = 0;
+    public int status;
+    public final int ENABLED = 1;
+    public final int DISABLED = 0;
+    public final int SAVE = 2;
 
     public EnergyLogger(Hardware hw, Drive drive) {
         now = Timer.getFPGATimestamp();
         this.hw = hw;
         this.drive = drive;
         errorWriting = false;
-        this.status = ENABLED;
+        this.status = DISABLED;
     }
 
     public void run() {
@@ -31,6 +32,10 @@ class EnergyLogger implements Runnable {
             System.err.println(e);
         }
         while(!Thread.interrupted()){
+            if(errorWriting){
+                save();
+                break;
+            }
             switch(status){
             case ENABLED:
                 this.now = Timer.getFPGATimestamp();
@@ -47,11 +52,12 @@ class EnergyLogger implements Runnable {
                 }
                 break;
             case DISABLED:
+                break;
+            case SAVE:
                 save();
                 break;
             }
         }
-
     }
 
     private void save() {
