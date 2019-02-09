@@ -27,8 +27,17 @@ class EnergyLogger implements Runnable {
         }
         while(!Thread.interrupted()){
             this.now = Timer.getFPGATimestamp();
-            double voltage= this.hw.pdp.getVoltage();
-
+            double voltage = this.hw.pdp.getVoltage();
+            double forward = this.drive.forward;
+            double turn = this.drive.turn;
+            String line = String.format("%f,%f,%f,%f,", this.now, voltage, forward, turn);
+            line += getCurrents();
+            try{
+                out.append(line);
+            } catch (Exception e){
+                errorWriting = true;
+                System.err.println(e);
+            }
         }
 
     }
@@ -63,7 +72,7 @@ class EnergyLogger implements Runnable {
     }
 
     private String buildHeadder(){
-        return "Time,Battery Voltage,Power Input,L1,L2,L3,R1,R2,R3\n";
+        return "Time,Battery Voltage,Forward power input,Turn power input,L1,L2,L3,R1,R2,R3\n";
     }
 
 }
