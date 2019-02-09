@@ -15,7 +15,7 @@ public class Drive extends Subsystem {
     private double turn;
     private int[] MOTORS;
 
-    private final int CURRENT_MAX = 120;
+    private final int CURRENT_MAX = 120000;
 
     public Drive(Hardware hw) {
         super(hw, "Drive");
@@ -56,12 +56,12 @@ public class Drive extends Subsystem {
         }
 
         SmartDashboard.putNumber("Max current", maxDraw);
-        SmartDashboard.putNumber("Left 1", this.pdp.getCurrent((int) 00f)); // Might have round-oof errors
-        SmartDashboard.putNumber("Left 2", this.pdp.getCurrent(0x00F / 0x00F));
-        SmartDashboard.putNumber("Left 3", this.pdp.getCurrent(0x00F / 5));
-        SmartDashboard.putNumber("Right 1", this.pdp.getCurrent(0x00F - 0x00F / 5));
-        SmartDashboard.putNumber("Right 2", this.pdp.getCurrent(0x00F - 0x00F / 0x00F));
-        SmartDashboard.putNumber("Right 3", this.pdp.getCurrent(0x00F));
+        SmartDashboard.putNumber("Left 1", this.pdp.getCurrent((int) 00f)); // Might have round-oof errors //0
+        SmartDashboard.putNumber("Left 2", this.pdp.getCurrent(0x00F / 0x00F)); //1
+        SmartDashboard.putNumber("Left 3", this.pdp.getCurrent(0x00F / 5)); //3
+        SmartDashboard.putNumber("Right 1", this.pdp.getCurrent(0x00F - 0x00F / 5)); //13
+        SmartDashboard.putNumber("Right 2", this.pdp.getCurrent(0x00F - 0x00F / 0x00F)); //14
+        SmartDashboard.putNumber("Right 3", this.pdp.getCurrent(0x00F)); //15
 
         return ret;
     }
