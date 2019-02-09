@@ -8,11 +8,13 @@ class EnergyLogger implements Runnable {
     FileWriter out;
     double now;
     Hardware hw;
+    Drive drive;
     boolean errorWriting;
 
-    public EnergyLogger(Hardware hw) {
+    public EnergyLogger(Hardware hw, Drive drive) {
         now = Timer.getFPGATimestamp();
         this.hw = hw;
+        this.drive = drive;
         errorWriting = false;
     }
 
@@ -25,6 +27,7 @@ class EnergyLogger implements Runnable {
         }
         while(!Thread.interrupted()){
             this.now = Timer.getFPGATimestamp();
+            double voltage= this.hw.pdp.getVoltage();
 
         }
 
