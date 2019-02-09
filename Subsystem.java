@@ -8,15 +8,11 @@ abstract class Subsystem implements Runnable {
     private final int DISABLED = 0;
     private final int ENABLED = 1;
 
-    private final Thread t;
-
     /**
      * Generic constructor for Subsystem class.
      */
     public Subsystem(Hardware hw) {
-        state = DISABLED;
-        t = new Thread(this, "Subsystem");
-        t.start();
+        this(hw, "Subsystem");
     }
 
     /**
@@ -25,8 +21,7 @@ abstract class Subsystem implements Runnable {
      */
     public Subsystem(Hardware hw, String name){
         state = DISABLED;
-        t = new Thread(this, name);
-        t.start();
+        new Thread(this, name).start();
     }
 
     /**
