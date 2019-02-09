@@ -2,7 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class Subsystem implements Runnable {
+abstract class Subsystem implements Runnable {
 
     private int state;
     private final int DISABLED = 0;
@@ -66,20 +66,13 @@ public class Subsystem implements Runnable {
 
     /**
      * The actions that should be taken every iteration
-     * THIS METHOD SHOULD BE OVERRIDDEN
+     * THIS METHOD MUST BE OVERRIDDEN
      */
-    protected void actions() {
-        System.err.println("***WARNING***");
-        System.err.println("actions() function has not been overridden");
-    }
+    abstract void actions();
 
     /**
      * This method should stop ALL motors associated with the subsystem
-     * THIS METHOD SHOULD BE OVERRIDDEN
+     * THIS METHOD MUST BE OVERRIDDEN
      */
-    protected void haltSystem(){
-        System.err.println("***WARNING***");
-        System.err.println("haltSystem() function has not been overridden");
-    }
-
+    abstract void haltSystem();
 }
