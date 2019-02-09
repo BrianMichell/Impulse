@@ -18,9 +18,15 @@ class EnergyLogger implements Runnable {
 
     public EnergyLogger(Hardware hw, Drive drive) {
         now = Timer.getFPGATimestamp();
+        errorWriting = false;
+        try {
+            this.out = new FileWriter(Double.toString(now));
+        } catch (Exception e){
+            System.err.println(e);
+            this.errorWriting = true;
+        }
         this.hw = hw;
         this.drive = drive;
-        errorWriting = false;
         this.status = DISABLED;
     }
 
