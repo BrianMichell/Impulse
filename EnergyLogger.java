@@ -11,11 +11,16 @@ class EnergyLogger implements Runnable {
     Drive drive;
     boolean errorWriting;
 
+    private int status;
+    private final int ENABLED = 1;
+    private final int DISABLED = 0;
+
     public EnergyLogger(Hardware hw, Drive drive) {
         now = Timer.getFPGATimestamp();
         this.hw = hw;
         this.drive = drive;
         errorWriting = false;
+        this.status = ENABLED;
     }
 
     public void run() {
@@ -26,17 +31,24 @@ class EnergyLogger implements Runnable {
             System.err.println(e);
         }
         while(!Thread.interrupted()){
-            this.now = Timer.getFPGATimestamp();
-            double voltage = this.hw.pdp.getVoltage();
-            double forward = this.drive.forward;
-            double turn = this.drive.turn;
-            String line = String.format("%f,%f,%f,%f,", this.now, voltage, forward, turn);
-            line += getCurrents();
-            try{
-                out.append(line);
-            } catch (Exception e){
-                errorWriting = true;
-                System.err.println(e);
+            switch(status){
+            case ENABLED:
+                this.now = Timer.getFPGATimestamp();
+                double voltage = this.hw.pdp.getVoltage();
+                double forward = this.drive.forward;
+                double turn = this.drive.turn;
+                String line = String.format("%f,%f,%f,%f,", this.now, voltage, forward, turn);
+                line += getCurrents();
+                try{
+                    out.append(line);
+                } catch (Exception e){
+                    errorWriting = true;
+                    System.err.println(e);
+                }
+                break;
+            case DISABLED:
+                save();
+                break;
             }
         }
 
@@ -51,12 +63,12 @@ class EnergyLogger implements Runnable {
         }
     }
 
-    private void enable() {
-
+    public void enable() {
+        status = ENABLED;
     }
 
-    private void disable() {
-
+    public void disable() {
+        status = DISABLED;
     }
 
     private String getCurrents(){
