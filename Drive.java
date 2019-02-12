@@ -11,8 +11,8 @@ public class Drive extends Subsystem {
 
     private double maxDraw = 0;
 
-    private double forward;
-    private double turn;
+    public double forward;
+    public double turn;
     private int[] MOTORS;
 
     private final int CURRENT_MAX = 120000;
