@@ -23,6 +23,8 @@ public class Robot extends TimedRobot {
 
     Toggle toggle;
 
+    EnergyLogger logger;
+
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
@@ -35,6 +37,8 @@ public class Robot extends TimedRobot {
         shift = new Shifter(hw);
 
         toggle = new Toggle();
+
+        logger = new EnergyLogger(hw, drive);
     }
 
     @Override
@@ -58,6 +62,9 @@ public class Robot extends TimedRobot {
         hatch.enable();
         shift.enable();
 
+        if(logger.status == logger.DISABLED){
+            logger.enable();
+        }
     }
 
     @Override
@@ -80,6 +87,8 @@ public class Robot extends TimedRobot {
         drive.disable();
         hatch.disable();
         shift.disable();
-
+        if(logger.status == logger.ENABLED){
+            logger.status = logger.SAVE;
+        }
     }
 }
