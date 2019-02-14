@@ -1,9 +1,11 @@
 package frc.robot;
 
 import java.nio.ByteBuffer;
+import java.lang.System;
 
 import edu.wpi.first.wpilibj.I2C;
 
+//TODO Implement runnable for constant update of sensor information
 class MPU9250 {
 
     //Register constants
@@ -24,20 +26,35 @@ class MPU9250 {
     
     private final I2C sensor;
     
+    //The change in time and last time gyro x-axis was updated
+    //TODO Update structure to do all gyro axes at once (starting with primary axis to ensure best accuracy)
+    private long deltaTGX; //This does not need to be an instance variable 
+    private long lastTGX;
+    private double gX;
+
     public MPU9250(){
         this(0x10, 0x10);
     }
     
+    //TODO change gyroDPS to instance variable to allow for headding calculations
     public MPU9250(int gyroDPS, int accelScale){
         sensor = new I2C(I2C.Port.kOnboard, this.MPU9250_ADDRESS);
         sensor.write(29, 0x06); //Set accelerometer low pass filter to 5Hz
         sensor.write(26, 0x06); //Set gyro low pass filter to 5Hz
         sensor.write(27, gyroDPS); //Set gyro to desired rate of change
         sensor.write(28, accelScale); //Set accelerometer to desired scale
+        this.deltaTGX = 0;
+        this.lastTGX = System.currentTimeMillis();
+        gX = 0.0;
     }
-    
-    public int getGyroX(){
-        return 0;
+
+    public double getGyroX(){
+        byte[] dataBuffer = read(0x43,2);
+        int xTmp = dataBuffer[0]<<8 | dataBuffer[1];
+        long now = System.currentTimeMillis();
+        deltaTGX = (now - lastTGX) / 1000; 
+        gX += (xTmp * deltaTGX) * (1000/32768); //Omega * dt * resolution
+        return gX;
     }
     
     public int getGyroY(){
@@ -83,4 +100,10 @@ class MPU9250 {
         System.out.println("One: " + ((rawGyro[0]<<8) | rawGyro[1]));
     }
     
+    private byte[] read(int address, int elements){
+        byte[] tmp = new byte[elements];
+        sensor.read(address, tmp.length, tmp);
+        return tmp;
+    }
+
 }
