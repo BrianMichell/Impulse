@@ -38,7 +38,7 @@ public class Hardware {
     // public final DoubleSolenoid rightShift = new DoubleSolenoid(2, 3);
 
     // Encoders
-    public final Encoder encoderTheta, encoderPhi;
+    public final Encoder encoderTheta, encoderPhi, driveEncoderLeft, driveEncoderRight;
     
     // Sensors
     public final BuiltInAccelerometer accelerometer;
@@ -61,6 +61,8 @@ public class Hardware {
         // Encoders
         encoderTheta = new Encoder(0, 1);
         encoderPhi = new Encoder(2, 3);
+        driveEncoderLeft = new Encoder(4, 5);
+        driveEncoderRight = new Encoder(6, 7);
 
         // Sensors
         accelerometer = new BuiltInAccelerometer();
