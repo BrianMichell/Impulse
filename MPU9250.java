@@ -38,11 +38,12 @@ class MPU9250 implements Runnable {
     private long lastTGX;
     private double gX;
 
+    private double scale;
+
     public MPU9250(){
         this(0x10, 0x10);
     }
     
-    //TODO change gyroDPS to instance variable to allow for headding calculations
     public MPU9250(int gyroDPS, int accelScale){
         sensor = new I2C(I2C.Port.kOnboard, this.MPU9250_ADDRESS);
         //sensor.write(29, 0x06); //Set accelerometer low pass filter to 5Hz
@@ -53,6 +54,7 @@ class MPU9250 implements Runnable {
         this.lastTGX = System.nanoTime();
         //this.lastTGX = System.currentTimeMillis(); //Millis() was too slow.
         gX = 1.0; //Start at 1 degree
+        this.scale = getDPS(gyroDPS);
         new Thread(this, "MPU9250").start();
     }
 
@@ -60,6 +62,19 @@ class MPU9250 implements Runnable {
         while(!Thread.interrupted()){
             updateGyroX();
             Timer.delay(0.0001);
+        }
+    }
+
+    private double getDPS(int dps){
+        switch(dps){
+            case(GYRO_250_DPS):
+                return SCALE_250_DPS;
+            case(GYRO_500_DPS):
+                return SCALE_500_DPS;
+            case(GYRO_1000_DPS):
+                return SCALE_1000_DPS;
+            default:
+                return SCALE_2000_DPS;
         }
     }
 
@@ -77,7 +92,7 @@ class MPU9250 implements Runnable {
         deltaTGX = (double) (now - lastTGX) / 1000000000;  //Explicit double cast required.
         //deltaTGX = (double)(now - lastTGX) / 1000;
         lastTGX = now;
-        gX += (double)(xTmp * deltaTGX) / SCALE_1000_DPS;// * (double)(2000/32768); //Omega * dt * resolution
+        gX += (double)(xTmp * deltaTGX) / scale;// * (double)(2000/32768); //Omega * dt * resolution
     }
     
     private void updateGyroY(){
@@ -88,7 +103,7 @@ class MPU9250 implements Runnable {
         long now = System.nanoTime();
         deltaTGY = (double) (now - lastTGY) / 1000000000;
         lastTGY = now;
-        gY += (double)(yTmp * deltaTGY) / SCALE_1000_DPS;
+        gY += (double)(yTmp * deltaTGY) / scale;
         */
     }
 
@@ -105,7 +120,7 @@ class MPU9250 implements Runnable {
         long now = System.nanoTime();
         deltaTGZ = (double) (now - lastTGZ) / 1000000000;
         lastTGZ = now;
-        gZ += (double)(zTmp * deltaTGZ) / SCALE_1000_DPS;
+        gZ += (double)(zTmp * deltaTGZ) / scale;
         */
     }
     
