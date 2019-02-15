@@ -6,7 +6,6 @@ import java.lang.System;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 
-//TODO Implement runnable for constant update of sensor information
 class MPU9250 implements Runnable {
 
     //Register constants
