@@ -4,9 +4,10 @@ import java.nio.ByteBuffer;
 import java.lang.System;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Timer;
 
 //TODO Implement runnable for constant update of sensor information
-class MPU9250 {
+class MPU9250 implements Runnable {
 
     //Register constants
     private final int MPU9250_ADDRESS = 0x68;
@@ -18,6 +19,11 @@ class MPU9250 {
     public final int GYRO_1000_DPS = 0x10;
     public final int GYRO_2000_DPS = 0x18;
 
+    private final double SCALE_250_DPS = 131;
+    private final double SCALE_500_DPS = 65.5;
+    private final double SCALE_1000_DPS = 32.8;
+    private final double SCALE_2000_DPS = 16.4;
+
     //Accelerometer register constants
     public final int ACC_SCALE_2_G = 0x00;
     public final int ACC_SCALE_4_G = 0x08;
@@ -28,7 +34,7 @@ class MPU9250 {
     
     //The change in time and last time gyro x-axis was updated
     //TODO Update structure to do all gyro axes at once (starting with primary axis to ensure best accuracy)
-    private long deltaTGX; //This does not need to be an instance variable 
+    private double deltaTGX; //This does not need to be an instance variable 
     private long lastTGX;
     private double gX;
 
@@ -39,22 +45,39 @@ class MPU9250 {
     //TODO change gyroDPS to instance variable to allow for headding calculations
     public MPU9250(int gyroDPS, int accelScale){
         sensor = new I2C(I2C.Port.kOnboard, this.MPU9250_ADDRESS);
-        sensor.write(29, 0x06); //Set accelerometer low pass filter to 5Hz
-        sensor.write(26, 0x06); //Set gyro low pass filter to 5Hz
+        //sensor.write(29, 0x06); //Set accelerometer low pass filter to 5Hz
+        //sensor.write(26, 0x06); //Set gyro low pass filter to 5Hz
         sensor.write(27, gyroDPS); //Set gyro to desired rate of change
         sensor.write(28, accelScale); //Set accelerometer to desired scale
         this.deltaTGX = 0;
-        this.lastTGX = System.currentTimeMillis();
-        gX = 0.0;
+        this.lastTGX = System.nanoTime();
+        //this.lastTGX = System.currentTimeMillis(); //Millis() was too slow.
+        gX = 1.0; //Start at 1 degree
+        new Thread(this, "MPU9250").start();
+    }
+
+    public void run(){
+        while(!Thread.interrupted()){
+            updateGyroX();
+            Timer.delay(0.0001);
+        }
     }
 
     public double getGyroX(){
+        System.out.println("Gyro X: " + this.gX);
+        return this.gX;
+    }
+
+    private void updateGyroX(){
         byte[] dataBuffer = read(0x43,2);
         int xTmp = dataBuffer[0]<<8 | dataBuffer[1];
-        long now = System.currentTimeMillis();
-        deltaTGX = (now - lastTGX) / 1000; 
-        gX += (xTmp * deltaTGX) * (1000/32768); //Omega * dt * resolution
-        return gX;
+        xTmp += 37; //Hardcoded bias`
+        //long now = System.currentTimeMillis();
+        long now = System.nanoTime();
+        deltaTGX = (double) (now - lastTGX) / 1000000000;  //Explicit double cast required.
+        //deltaTGX = (double)(now - lastTGX) / 1000;
+        lastTGX = now;
+        gX += (double)(xTmp * deltaTGX) / SCALE_1000_DPS;// * (double)(2000/32768); //Omega * dt * resolution
     }
     
     public int getGyroY(){
