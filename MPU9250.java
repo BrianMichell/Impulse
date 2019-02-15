@@ -80,11 +80,37 @@ class MPU9250 implements Runnable {
         gX += (double)(xTmp * deltaTGX) / SCALE_1000_DPS;// * (double)(2000/32768); //Omega * dt * resolution
     }
     
+    private void updateGyroY(){
+        /*
+        byte[] dataBuffer = read(0x45, 2);
+        int yTmp = dataBuffer[0]<<8 | dataBuffer[1];
+        yTmp += 37; //Hardcoded bias
+        long now = System.nanoTime();
+        deltaTGY = (double) (now - lastTGY) / 1000000000;
+        lastTGY = now;
+        gY += (double)(yTmp * deltaTGY) / SCALE_1000_DPS;
+        */
+    }
+
     public int getGyroY(){
+        //return gY;
         return 0;
+    }
+
+    private void updateGyroZ(){
+        /*
+        byte[] dataBuffer = read(0x47, 2);
+        int zTmp = dataBuffer[0]<<8 | dataBuffer[1];
+        zTmp += 37; //Hardcoded bias
+        long now = System.nanoTime();
+        deltaTGZ = (double) (now - lastTGZ) / 1000000000;
+        lastTGZ = now;
+        gZ += (double)(zTmp * deltaTGZ) / SCALE_1000_DPS;
+        */
     }
     
     public int getGyroZ(){
+        //return gZ;
         return 0;
     }
     
