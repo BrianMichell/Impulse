@@ -43,6 +43,7 @@ class MPU9250 implements Runnable {
     private double deltaTGX; //This does not need to be an instance variable 
     private long lastTGX;
     private double gX;
+    private int biasGX;
 
     private double scale;
 
@@ -58,6 +59,7 @@ class MPU9250 implements Runnable {
         sensor.write(28, accelScale); //Set accelerometer to desired scale
         this.deltaTGX = 0;
         this.lastTGX = System.nanoTime();
+        this.biasGX = 0;
         //this.lastTGX = System.currentTimeMillis(); //Millis() was too slow.
         gX = 1.0; //Start at 1 degree
         this.scale = getDPS(gyroDPS);
@@ -84,30 +86,57 @@ class MPU9250 implements Runnable {
         }
     }
 
+    
+    //GYRO X START ----------------------------------------------
+    /**
+     * @return Returns true when completed calibrations
+     */
+    public boolean calibrateGX(){
+        biasGX = -25; //Hardcoded bias
+        return true;
+    }
+
+    public void resetGX(){
+        this.gX = 0;
+    }
+
+    public double getGXRate(){
+        byte[] dataBuffer = read(0x47, 2); //TODO Change this back to X-axis instead of Z-axis
+        int xTmp = dataBuffer[0]<<8 | dataBuffer[1];
+        xTmp += biasGX;
+        xTmp /= scale;
+        return xTmp;
+    }
+
+    private void updateGyroX(){
+        double xTmp = getGXRate();
+        long now = System.nanoTime();
+        deltaTGX = (double) (now - lastTGX) / 1000000000;  //Explicit double cast required.
+        lastTGX = now;
+        gX += (double)(xTmp * deltaTGX);
+    }
+
     public double getGyroX(){
         System.out.println("Gyro X: " + this.gX);
         return this.gX;
     }
+    //GYRO X END ----------------------------------------------
 
-    private void updateGyroX(){
-        byte[] dataBuffer = read(0x47, 2);
-        //byte[] dataBuffer = read(0x43,2);
-        int xTmp = dataBuffer[0]<<8 | dataBuffer[1];
-        xTmp -= 25;
-        //xTmp += 37; //Hardcoded bias`
-        //long now = System.currentTimeMillis();
-        long now = System.nanoTime();
-        deltaTGX = (double) (now - lastTGX) / 1000000000;  //Explicit double cast required.
-        //deltaTGX = (double)(now - lastTGX) / 1000;
-        lastTGX = now;
-        gX += (double)(xTmp * deltaTGX) / scale;// * (double)(2000/32768); //Omega * dt * resolution
-    }
-    
-    private void updateGyroY(){
+    //GYRO Y START --------------------------------------------
+    public int getGYRate(){
         /*
         byte[] dataBuffer = read(0x45, 2);
-        int yTmp = dataBuffer[0]<<8 | dataBuffer[1];
-        yTmp += 37; //Hardcoded bias
+        double yTmp = dataBuffer[0]<<8 | dataBuffer[1];
+        yTmp += biasGY;
+        yTmp /= scale;
+        return yTmp;
+        */
+        return 0;
+    }
+
+    private void updateGyroY(){
+        /*
+        double yTmp = getGYRate();
         long now = System.nanoTime();
         deltaTGY = (double) (now - lastTGY) / 1000000000;
         lastTGY = now;
@@ -119,12 +148,22 @@ class MPU9250 implements Runnable {
         //return gY;
         return 0;
     }
+    //GYRO Y END -----------------------------------------------
 
-    private void updateGyroZ(){
+    //GYRO Z START ---------------------------------------------
+    public double getGZRate(){
         /*
         byte[] dataBuffer = read(0x47, 2);
         int zTmp = dataBuffer[0]<<8 | dataBuffer[1];
-        zTmp += 37; //Hardcoded bias
+        zTmp += biasGZ;
+        zTmp /= scale;
+        return zTmp;
+        */
+        return 0;
+    }
+
+    private void updateGyroZ(){
+        /*
         long now = System.nanoTime();
         deltaTGZ = (double) (now - lastTGZ) / 1000000000;
         lastTGZ = now;
@@ -136,6 +175,7 @@ class MPU9250 implements Runnable {
         //return gZ;
         return 0;
     }
+    //GYRO Z END ------------------------------------------------
     
     public void printData(){
         byte[] dataBuffer = new byte[14];
