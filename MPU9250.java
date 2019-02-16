@@ -18,10 +18,17 @@ class MPU9250 implements Runnable {
     public final int GYRO_1000_DPS = 0x10;
     public final int GYRO_2000_DPS = 0x18;
 
+    /*
+    Numbers given in the datasheet were a third off
     private final double SCALE_250_DPS = 131;
     private final double SCALE_500_DPS = 65.5;
     private final double SCALE_1000_DPS = 32.8;
     private final double SCALE_2000_DPS = 16.4;
+    */
+    private final double SCALE_250_DPS = 131 * 1.125/2;
+    private final double SCALE_500_DPS = 65.5 * 1.125/2;
+    private final double SCALE_1000_DPS = 32.8 * 1.125/2;
+    private final double SCALE_2000_DPS = 16.4 * 1.125/2;
 
     //Accelerometer register constants
     public final int ACC_SCALE_2_G = 0x00;
@@ -45,8 +52,8 @@ class MPU9250 implements Runnable {
     
     public MPU9250(int gyroDPS, int accelScale){
         sensor = new I2C(I2C.Port.kOnboard, this.MPU9250_ADDRESS);
-        //sensor.write(29, 0x06); //Set accelerometer low pass filter to 5Hz
-        //sensor.write(26, 0x06); //Set gyro low pass filter to 5Hz
+        sensor.write(29, 0x06); //Set accelerometer low pass filter to 5Hz
+        sensor.write(26, 0x06); //Set gyro low pass filter to 5Hz
         sensor.write(27, gyroDPS); //Set gyro to desired rate of change
         sensor.write(28, accelScale); //Set accelerometer to desired scale
         this.deltaTGX = 0;
@@ -83,9 +90,11 @@ class MPU9250 implements Runnable {
     }
 
     private void updateGyroX(){
-        byte[] dataBuffer = read(0x43,2);
+        byte[] dataBuffer = read(0x47, 2);
+        //byte[] dataBuffer = read(0x43,2);
         int xTmp = dataBuffer[0]<<8 | dataBuffer[1];
-        xTmp += 37; //Hardcoded bias`
+        xTmp -= 25;
+        //xTmp += 37; //Hardcoded bias`
         //long now = System.currentTimeMillis();
         long now = System.nanoTime();
         deltaTGX = (double) (now - lastTGX) / 1000000000;  //Explicit double cast required.
