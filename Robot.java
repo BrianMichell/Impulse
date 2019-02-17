@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
 
-    /*
     DriverJoystick driver;
     
     Hardware hw;
@@ -24,27 +23,19 @@ public class Robot extends TimedRobot {
 
     Toggle toggle;
 
-    EnergyLogger logger;
-    */
-
-    MPU9250 gyro;
-
     @Override
     public void robotInit() {
-        //driver = new DriverJoystick(0);
+        driver = new DriverJoystick(0);
         
-        //hw = new Hardware();
+        hw = new Hardware();
         
-        //climber = new Climber(hw);
-        //drive = new Drive(hw);
-        //hatch = new Hatch(hw);
-        //shift = new Shifter(hw);
+        climber = new Climber(hw);
+        drive = new Drive(hw);
+        hatch = new Hatch(hw);
+        shift = new Shifter(hw);
 
-        //toggle = new Toggle();
+        toggle = new Toggle();
 
-        //logger = new EnergyLogger(hw, drive);
-
-        gyro = new MPU9250();
     }
 
     @Override
@@ -63,46 +54,31 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit(){
-        /*
         climber.enable();
         drive.enable();
         hatch.enable();
         shift.enable();
-
-        if(logger.status == logger.DISABLED){
-            logger.enable();
-        }
-        */
     }
 
     @Override
     public void teleopPeriodic() {
         //Collect all joystick inputs
-        //boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
+        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
 
-        //shift.setInHighGear(toggle.update(dRB));
+        shift.setInHighGear(toggle.update(dRB));
 
-        //drive.updateSpeeds(driver.getForward(), driver.getTurn());
+        drive.updateSpeeds(driver.getForward(), driver.getTurn());
     }
 
     @Override
     public void testPeriodic() {
-        //gyro.printData();
-        //gyro.printAccel();
-        //gyro.printGyro();
-        gyro.getGyroX();
     }
 
     @Override
     public void disabledPeriodic(){
-        /*
         climber.disable();
         drive.disable();
         hatch.disable();
         shift.disable();
-        if(logger.status == logger.ENABLED){
-            logger.status = logger.SAVE;
-        }
-        */
     }
 }
