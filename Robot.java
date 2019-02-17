@@ -9,10 +9,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 
 public class Robot extends TimedRobot {
 
     DriverJoystick driver;
+    Joystick secondary;
     
     Hardware hw;
     
@@ -26,6 +28,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
+        secondary = new Joystick(1);
         
         hw = new Hardware();
         

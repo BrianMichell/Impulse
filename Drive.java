@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends Subsystem {
 
-    private final DifferentialDrive drive;
+    private final HackedDD drive;
     private final PowerDistributionPanel pdp;
 
     private double maxDraw = 0;
