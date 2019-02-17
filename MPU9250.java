@@ -67,6 +67,7 @@ class MPU9250 implements Runnable {
     }
 
     public void run(){
+        calibrateGX();
         while(!Thread.interrupted()){
             updateGyroX();
             Timer.delay(0.0001);
@@ -92,7 +93,15 @@ class MPU9250 implements Runnable {
      * @return Returns true when completed calibrations
      */
     public boolean calibrateGX(){
-        biasGX = -25; //Hardcoded bias
+        int changeAccumulator = 0;
+        double samples = 25;
+        for(int i=0; i < samples; i++){
+            byte[] tmp = read(0x47, 2);
+            changeAccumulator += (tmp[0]<<8 | tmp[1]); 
+        }
+        this.biasGX = -(int)(changeAccumulator/samples);
+        System.out.println(biasGX);
+        //biasGX = -25; //Hardcoded bias
         return true;
     }
 
