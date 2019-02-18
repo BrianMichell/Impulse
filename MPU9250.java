@@ -60,8 +60,7 @@ class MPU9250 implements Runnable {
         this.deltaTGX = 0;
         this.lastTGX = System.nanoTime();
         this.biasGX = 0;
-        //this.lastTGX = System.currentTimeMillis(); //Millis() was too slow.
-        gX = 1.0; //Start at 1 degree
+        gX = 0.0;
         this.scale = getDPS(gyroDPS);
         new Thread(this, "MPU9250").start();
     }
@@ -101,12 +100,11 @@ class MPU9250 implements Runnable {
         }
         this.biasGX = -(int)(changeAccumulator/samples);
         System.out.println(biasGX);
-        //biasGX = -25; //Hardcoded bias
         return true;
     }
 
     public void resetGX(){
-        this.gX = 0;
+        this.gX = 0.0;
     }
 
     public double getGXRate(){
@@ -185,41 +183,6 @@ class MPU9250 implements Runnable {
         return 0;
     }
     //GYRO Z END ------------------------------------------------
-    
-    public void printData(){
-        byte[] dataBuffer = new byte[14];
-        sensor.read(MPU9250_ADDRESS, 14, dataBuffer);
-        ByteBuffer compBuffer = ByteBuffer.wrap(dataBuffer);
-        int aX, aY, aZ, gX, gY, gZ;
-        aX = -(dataBuffer[0]<<8 | dataBuffer[1]);
-        aY = -(dataBuffer[2]<<8 | dataBuffer[3]);
-        aZ = dataBuffer[4]<<8 | dataBuffer[5];
-
-        gX = -(compBuffer.get(8)<<8 | compBuffer.get(9));
-        gY = -(compBuffer.get(10)<<8 | compBuffer.get(11));
-        gZ = compBuffer.get(12)<<8 | compBuffer.get(13);
-
-        System.out.println("Accelerometer X: " + aX);
-        System.out.println("Accelerometer Y: " + aY);
-        System.out.println("Accelerometer Z: " + aZ);
-        System.out.println("Gyro X: " + gX);
-        System.out.println("Gyro Y: " + gY);
-        System.out.println("Gyro Z: " + gZ);
-    }
-
-    public void printAccel(){
-        byte[] accelRaw = new byte[6];
-        sensor.read(0x3B, 6, accelRaw);
-        System.out.println("One: " + ((accelRaw[0]<<8) | accelRaw[1]));
-        System.out.println("Two: " + ((accelRaw[2]<<8) | accelRaw[3]));
-        System.out.println("Three: "+ ((accelRaw[4]<<8) | accelRaw[5]));
-    }
-    
-    public void printGyro(){
-        byte[] rawGyro = new byte[6];
-        sensor.read(0x43, 6, rawGyro);
-        System.out.println("One: " + ((rawGyro[0]<<8) | rawGyro[1]));
-    }
     
     private byte[] read(int address, int elements){
         byte[] tmp = new byte[elements];
