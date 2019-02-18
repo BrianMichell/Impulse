@@ -8,37 +8,38 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 
 public class Robot extends TimedRobot {
 
     DriverJoystick driver;
-    Joystick secondary;
+    XboxController secondary;
     
     Hardware hw;
     
     Climber climber;
+    Level2 level2;
     Drive drive;
     Hatch hatch;
     Shifter shift;
 
-    Toggle toggle;
+    Toggle shiftToggle;
 
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
-        secondary = new Joystick(1);
+        secondary = new XboxController(1);
         
         hw = new Hardware();
         
         climber = new Climber(hw);
+        level2 = new Level2(hw);
         drive = new Drive(hw);
         hatch = new Hatch(hw);
         shift = new Shifter(hw);
 
-        toggle = new Toggle();
-
+        shiftToggle = new Toggle();
     }
 
     @Override
@@ -68,7 +69,17 @@ public class Robot extends TimedRobot {
         //Collect all joystick inputs
         boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
 
-        shift.setInHighGear(toggle.update(dRB));
+        boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
+
+        double theta, phi;
+        theta = secondary.getRawAxis(1);
+        phi = secondary.getRawAxis(5);
+        climber.manualDrive(theta, phi);
+
+        shift.setInHighGear(shiftToggle.update(dRB));
+        hatch.setOpen(dLB);
+
+        level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
 
         drive.updateSpeeds(driver.getForward(), driver.getTurn());
     }
