@@ -5,15 +5,13 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class Shifter extends Subsystem {
 
-    //private DoubleSolenoid leftShift;
-    //private DoubleSolenoid rightShift;
+    private DoubleSolenoid shifter;
 
     private boolean highGear;
 
     public Shifter(Hardware hw){
         super(hw, "Shifter");
-        //this.leftShift = hw.leftShift;
-        //this.rightShift = hw.rightShift;
+        this.shifter = hw.shifter;
         this.highGear = false;
     }
 
@@ -32,11 +30,9 @@ public class Shifter extends Subsystem {
      */
     private void shift(){
         if(highGear){
-            //this.leftShift.set(Value.kForward);
-            //this.rightShift.set(Value.kForward);
+            this.shifter.set(Value.kForward);
         } else {
-            //this.leftShift.set(Value.kReverse);
-            //this.rightShift.set(Value.kReverse);
+            this.shifter.set(Value.kReverse);
         }
     }
 
