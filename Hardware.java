@@ -7,22 +7,20 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.VictorSP;
-
-import com.ctre.phoenix.motorcontrol.can.*;
 
 public class Hardware {
 
     // Motors
-    public final VictorSPX leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
-    public final HackedDD drive;
+    public final VictorSPX2 leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
+    public final DifferentialDrive drive;
     public final VictorSP thetaOne, thetaTwo, phiOne, phiTwo;
 
     // Pneumatics
     public final Compressor compressor = new Compressor();
-    public final DoubleSolenoid leftShift = new DoubleSolenoid(0, 1);
-    public final DoubleSolenoid rightShift = new DoubleSolenoid(2, 3);
+    public final DoubleSolenoid shifter = new DoubleSolenoid(0, 1);
+    public final DoubleSolenoid hatchClamp = new DoubleSolenoid(4, 6);
+    public final DoubleSolenoid climberPistons = new DoubleSolenoid(5, 7);
 
     // Encoders
     public final Encoder encoderTheta, encoderPhi;
@@ -35,23 +33,22 @@ public class Hardware {
 
     public Hardware() {
         // Motors
-        leftDrive1 = new VictorSPX(0);
-        leftDrive2 = new VictorSPX(1);
-        leftDrive3 = new VictorSPX(3);
-        rightDrive1 = new VictorSPX(4);
-        rightDrive2 = new VictorSPX(5);
-        rightDrive3 = new VictorSPX(6);
+        leftDrive1 = new VictorSPX2(1);
+        leftDrive2 = new VictorSPX2(2);
+        leftDrive3 = new VictorSPX2(3);
+        rightDrive1 = new VictorSPX2(4);
+        rightDrive2 = new VictorSPX2(5);
+        rightDrive3 = new VictorSPX2(6);
 
-        //SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2, leftDrive3);
-        //SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2, rightDrive3);
+        SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2, leftDrive3);
+        SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2, rightDrive3);
 
-        drive = new HackedDD(leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3);
-        //drive = new DifferentialDrive(leftDrive, rightDrive);
+        drive = new DifferentialDrive(left, right);
 
-        thetaOne = new VictorSP(4);
-        thetaTwo = new VictorSP(5);
-        phiOne = new VictorSP(6);
-        phiTwo = new VictorSP(7);
+        thetaOne = new VictorSP(1);
+        thetaTwo = new VictorSP(2);
+        phiOne = new VictorSP(3);
+        phiTwo = new VictorSP(4);
 
         // Encoders
         encoderTheta = new Encoder(0, 1);
