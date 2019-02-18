@@ -3,6 +3,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.VictorSP;
+
 
 class Climber extends Subsystem {
 
@@ -10,6 +12,8 @@ class Climber extends Subsystem {
     BuiltInAccelerometer accelerometer;
     Encoder encoderPhi;
     Encoder encoderTheta;
+
+    VictorSP theatOne, thetaTwo, phiOne, phiTwo;
 
     private double linkageOneSpeed;
     private double linkageTwoSpeed;
@@ -32,13 +36,24 @@ class Climber extends Subsystem {
         this.stage = this.DISABLED;
         this.linkageOneSpeed = 0.0;
         this.linkageTwoSpeed = 0.0;
+        this.thetaTwo = hw.thetaTwo;
+        this.theatOne = hw.thetaOne;
+        this.phiOne = hw.phiOne;
+        this.phiTwo = hw.phiTwo;
     }
 
     @Override
     protected void actions(){
         if(isEndgame()){
-            climb();
+            //climb();
         }
+    }
+
+    public void manualDrive(double theta, double phi){
+        thetaTwo.set(theta);
+        theatOne.set(theta);
+        phiOne.set(phi);
+        phiTwo.set(phi);
     }
 
     private void climb(){
