@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends Subsystem {
 
-    private final HackedDD drive;
+    private final DifferentialDrive drive;
     private final PowerDistributionPanel pdp;
 
     private double maxDraw = 0;
@@ -15,7 +15,7 @@ public class Drive extends Subsystem {
     public double turn;
     private int[] MOTORS;
 
-    private final int CURRENT_MAX = 120000;
+    private final int CURRENT_MAX = 120;
 
     public Drive(Hardware hw) {
         super(hw, "Drive");
@@ -112,7 +112,7 @@ public class Drive extends Subsystem {
         if (overCurrent()) {
             return input >= 0 ? -0.01 : 0.01; // TODO Actually implement a rampdown for current limiting
         }
-        return Math.pow(input, 3) / 4;
+        return Math.pow(input, 3) / 10;
     }
 
     /**
