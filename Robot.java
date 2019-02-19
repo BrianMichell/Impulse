@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 public class Robot extends TimedRobot {
 
     DriverJoystick driver;
-    //XboxController secondary;
+    XboxController secondary;
     
     Hardware hw;
     
@@ -27,10 +27,12 @@ public class Robot extends TimedRobot {
 
     Toggle shiftToggle;
 
+    PID driveController;
+
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
-        //secondary = new XboxController(1);
+        secondary = new XboxController(1);
         
         hw = new Hardware();
         
@@ -42,6 +44,8 @@ public class Robot extends TimedRobot {
 
         shiftToggle = new Toggle();
         hw.gyro.calibrateGX();
+
+        driveController = new PID(1.0, 1.0, 1.0, hw.gyro);
     }
 
     @Override
@@ -74,26 +78,52 @@ public class Robot extends TimedRobot {
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
 
-        //double theta, phi;
-        //theta = secondary.getRawAxis(1);
-        //phi = secondary.getRawAxis(5);
-        //climber.manualDrive(theta, phi);
+        double theta, phi;
+        theta = secondary.getRawAxis(1);
+        phi = secondary.getRawAxis(5);
+        climber.manualDrive(theta, phi);
 
         shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
 
-        //level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
+        level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
         SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
-        SmartDashboard.putNumber("Accel X", hw.gyro.getAccelX());
-        SmartDashboard.putNumber("Accel Y", hw.gyro.getAccelY());
-        SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
+        //SmartDashboard.putNumber("Accel X", hw.gyro.getAccelX());
+        //SmartDashboard.putNumber("Accel Y", hw.gyro.getAccelY());
+        //SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
 
-        drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         if(dRT > 0.2 || dLT > 0.2) {
+            driveController.disable();
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
+        } else if(driver.joystick.getYButton()) {
+            drive.setTank(true);
+            driveController.setSetpoint(0.0);
+            driveController.enable();
+            hw.drive.arcadeDrive(0, driveController.output);
+            //drive.calculateTurn(hw.gyro.getGyroX(), 0.0);
+        } else if(driver.joystick.getAButton()) {
+            drive.setTank(true);
+            driveController.setSetpoint(180.0);
+            driveController.enable();
+            hw.drive.arcadeDrive(0, driveController.output);
+            //drive.calculateTurn(hw.gyro.getGyroX(), 180.0);
+        } else if(driver.joystick.getXButton()) {
+            drive.setTank(true);
+            driveController.setSetpoint(90.0);
+            driveController.enable();
+            hw.drive.arcadeDrive(0, driveController.output);
+            // drive.calculateTurn(hw.gyro.getGyroX(), 90.0);
+        } else if(driver.joystick.getBButton()) {
+            drive.setTank(true);
+            driveController.setSetpoint(270.0);
+            driveController.enable();
+            hw.drive.arcadeDrive(0, driveController.output);
+            // drive.calculateTurn(hw.gyro.getGyroX(), 270.0);
         } else {
+            driveController.disable();
             drive.setTank(false);
+            drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
     }
 
@@ -107,5 +137,6 @@ public class Robot extends TimedRobot {
         drive.disable();
         hatch.disable();
         shift.disable();
+        driveController.disable();
     }
 }
