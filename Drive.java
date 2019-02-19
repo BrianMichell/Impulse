@@ -10,12 +10,13 @@ public class Drive extends Subsystem {
     private final PowerDistributionPanel pdp;
 
     private double maxDraw = 0;
+    private boolean isTank = false;
 
     public double forward;
     public double turn;
     // private int[] MOTORS;
 
-    private final int CURRENT_MAX = 120;
+    private final int CURRENT_MAX = 100;
 
     public Drive(Hardware hw) {
         super(hw, "Drive");
@@ -26,10 +27,9 @@ public class Drive extends Subsystem {
 
     @Override
     protected void actions() {
-        double _forward = DriverJoystick.getForward();
-        double _turn = DriverJoystick.getTurn();
-        updateSpeeds(_forward, _turn);
-        this.drive.arcadeDrive(forward, turn);
+        if(!isTank){
+            this.drive.arcadeDrive(forward, turn, false);
+        }
         SmartDashboard.putNumber("Forward speed", forward);
         SmartDashboard.putNumber("Turn speed", turn);
     }
@@ -37,6 +37,8 @@ public class Drive extends Subsystem {
     @Override
     protected void haltSystem() {
         this.drive.stopMotor();
+        this.forward = 0.0;
+        this.turn = 0.0;
     }
 
     /**
@@ -72,31 +74,11 @@ public class Drive extends Subsystem {
      * @param _forward The forward/backward power
      * @param _turn    The twist power
      */
-    public void updateSpeeds(double _forward, double _turn) {
+    public void updateSpeeds(double _forward, double _turn, boolean highGear) {
 
         double forwardChange, turnChange;
-        forwardChange = calculateIncrease(_forward);
-        turnChange = calculateIncrease(_turn);
-
-        // Flip the signs so the power creeps down
-        if (Math.abs(forwardChange) < Math.abs(this.forward)) {
-            if (forwardChange > this.forward) {
-                forwardChange *= -1.0;
-            }
-            if (forwardChange == 0) {
-                forwardChange = this.forward / 1.1125;
-            }
-        }
-
-        if (Math.abs(turnChange) < Math.abs(this.turn)) {
-            if (turnChange > this.turn) {
-                turnChange *= -1;
-            }
-            if (turnChange == 0) {
-                turnChange = this.turn / 1.1125;
-            }
-        }
-
+        forwardChange = calculateIncrease(_forward, forward, highGear);
+        turnChange = calculateIncrease(_turn, turn, highGear);
         
         this.forward += forwardChange;
         this.turn += turnChange;
@@ -106,16 +88,20 @@ public class Drive extends Subsystem {
         if (Math.abs(this.turn) > Math.abs(_turn)) {
             this.turn = _turn;
         }
-        System.out.println(this.forward);
-
     }
 
-    private double calculateIncrease(double input) {
-        int divideFactor = 5;
-        //if (overCurrent()) {
-        if(underVoltage()){
+    private double calculateIncrease(double input, double currentOutput, boolean highGear) {
+        int divideFactor = 12;
+        double limitedBand = 0.3;
+        if(highGear) {
+            limitedBand += 0.15;
+        }
+        if(Math.abs(input) <= limitedBand && Math.abs(currentOutput) <= limitedBand) {
+            divideFactor = 17;
+        }
+        if (overCurrent() || underVoltage()) {
             input *= -1.0;
-            divideFactor *= 10;
+            divideFactor *= 5;
         }
         return Math.pow(input, 3) / (double) divideFactor;
     }
@@ -130,6 +116,18 @@ public class Drive extends Subsystem {
 
     public boolean underVoltage() {
         return this.pdp.getVoltage() < 8.5;
+    }
+
+    public void oneSideTurn(double leftPower, double rightPower){
+        if(leftPower > 0 ){
+            this.drive.tankDrive(leftPower/1.125, -0.3);
+        } else {
+            this.drive.tankDrive(-0.3, rightPower/1.125);
+        }
+    }
+
+    public void setTank(boolean isTank){
+        this.isTank = isTank;
     }
 
 }

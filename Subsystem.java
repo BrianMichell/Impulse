@@ -41,7 +41,7 @@ abstract class Subsystem implements Runnable {
                     haltSystem();
                     break;
             }
-            Timer.delay(0.005);
+            Timer.delay(0.001);
         }
     }
 

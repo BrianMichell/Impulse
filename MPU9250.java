@@ -25,10 +25,10 @@ class MPU9250 implements Runnable {
     private final double SCALE_1000_DPS = 32.8;
     private final double SCALE_2000_DPS = 16.4;
     */
-    private final double SCALE_250_DPS = 131 * 1.125/2;
-    private final double SCALE_500_DPS = 65.5 * 1.125/2;
-    private final double SCALE_1000_DPS = 32.8 * 1.125/2;
-    private final double SCALE_2000_DPS = 16.4 * 1.125/2;
+    private final double SCALE_250_DPS = 131 * 1.112/2;
+    private final double SCALE_500_DPS = 65.5 * 1.112/2;
+    private final double SCALE_1000_DPS = 32.8 * 1.112/2;
+    private final double SCALE_2000_DPS = 16.4 * 1.112/2;
 
     //Accelerometer register constants
     public final int ACC_SCALE_2_G = 0x00;
@@ -44,6 +44,16 @@ class MPU9250 implements Runnable {
     private long lastTGX;
     private double gX;
     private int biasGX;
+
+    private double deltaTGY;
+    private long lastTGY;
+    private double gY;
+    private int biasGY;
+
+    private double deltaTGZ;
+    private long lastTGZ;
+    private double gZ;
+    private int biasGZ;
 
     private double scale;
 
@@ -118,13 +128,12 @@ class MPU9250 implements Runnable {
     private void updateGyroX(){
         double xTmp = getGXRate();
         long now = System.nanoTime();
-        deltaTGX = (double) (now - lastTGX) / 1000000000;  //Explicit double cast required.
+        deltaTGX = (double) (now - lastTGX) / (double)1000000000;  //Explicit double cast required.
         lastTGX = now;
         gX += (double)(xTmp * deltaTGX);
     }
 
     public double getGyroX(){
-        System.out.println("Gyro X: " + this.gX);
         return this.gX;
     }
     //GYRO X END ----------------------------------------------
@@ -183,6 +192,25 @@ class MPU9250 implements Runnable {
         return 0;
     }
     //GYRO Z END ------------------------------------------------
+
+    public int getAccelX(){
+        byte[] buffer = read(0x00, 2);
+        int xTmp = buffer[0] << 8 | buffer[1];
+        return xTmp;
+    }
+
+    public int getAccelY(){
+        byte[] buffer = read(0x00, 2);
+        int yTmp = buffer[0] << 8 | buffer[1];
+        return yTmp;
+    }
+
+    public int getAccelZ(){
+        byte[] buffer = read(0x00, 2);
+        int zTmp = buffer[0] << 8 | buffer[1];
+        return zTmp;
+    }
+
     
     private byte[] read(int address, int elements){
         byte[] tmp = new byte[elements];

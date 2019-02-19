@@ -9,12 +9,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
 
     DriverJoystick driver;
-    XboxController secondary;
+    //XboxController secondary;
     
     Hardware hw;
     
@@ -29,7 +30,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
-        secondary = new XboxController(1);
+        //secondary = new XboxController(1);
         
         hw = new Hardware();
         
@@ -40,6 +41,7 @@ public class Robot extends TimedRobot {
         shift = new Shifter(hw);
 
         shiftToggle = new Toggle();
+        hw.gyro.calibrateGX();
     }
 
     @Override
@@ -68,20 +70,28 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         //Collect all joystick inputs
         boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
-
         boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
+        double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
+        double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
 
-        double theta, phi;
-        theta = secondary.getRawAxis(1);
-        phi = secondary.getRawAxis(5);
-        climber.manualDrive(theta, phi);
+        //double theta, phi;
+        //theta = secondary.getRawAxis(1);
+        //phi = secondary.getRawAxis(5);
+        //climber.manualDrive(theta, phi);
 
         shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
 
-        level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
+        //level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
+        SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
-        drive.updateSpeeds(driver.getForward(), driver.getTurn());
+        drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
+        if(dRT > 0.2 || dLT > 0.2) {
+            drive.setTank(true);
+            drive.oneSideTurn(dLT, dRT);
+        } else {
+            drive.setTank(false);
+        }
     }
 
     @Override

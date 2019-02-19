@@ -44,4 +44,8 @@ public class Shifter extends Subsystem {
         highGear = !value;
     }
 
+    public boolean isHighGear(){
+        return highGear;
+    }
+
 }
