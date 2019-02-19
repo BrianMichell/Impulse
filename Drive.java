@@ -13,7 +13,7 @@ public class Drive extends Subsystem {
 
     public double forward;
     public double turn;
-    private int[] MOTORS;
+    // private int[] MOTORS;
 
     private final int CURRENT_MAX = 120;
 
@@ -21,17 +21,17 @@ public class Drive extends Subsystem {
         super(hw, "Drive");
         this.drive = hw.drive;
         this.pdp = hw.pdp;
-        this.MOTORS = hw.MOTORS;
+        // this.MOTORS = hw.MOTORS;
     }
 
     @Override
     protected void actions() {
-        double forward = DriverJoystick.getForward();
-        double turn = DriverJoystick.getTurn();
-        updateSpeeds(forward, turn);
+        double _forward = DriverJoystick.getForward();
+        double _turn = DriverJoystick.getTurn();
+        updateSpeeds(_forward, _turn);
         this.drive.arcadeDrive(forward, turn);
-        SmartDashboard.putNumber("Forward speed", this.forward);
-        SmartDashboard.putNumber("Turn speed", this.turn);
+        SmartDashboard.putNumber("Forward speed", forward);
+        SmartDashboard.putNumber("Turn speed", turn);
     }
 
     @Override
@@ -45,14 +45,14 @@ public class Drive extends Subsystem {
      * @return The total number of amps drawn by the drivetrain
      */
     private double reportCurrentDraw() {
-        double ret = 0;
+        double currentCurrent = 0;
         /*
          * for(int i=0; i<MOTORS.length; i++){ ret += this.pdp.getCurrent(MOTORS[i]); }
          */
-        ret = this.pdp.getTotalCurrent();
-        SmartDashboard.putNumber("Drivetrain current draw", ret);
-        if (ret > maxDraw) {
-            maxDraw = ret;
+        currentCurrent = this.pdp.getTotalCurrent();
+        SmartDashboard.putNumber("Drivetrain current draw", currentCurrent);
+        if (currentCurrent > maxDraw) {
+            maxDraw = currentCurrent;
         }
 
         SmartDashboard.putNumber("Max current", maxDraw);
@@ -63,20 +63,20 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Right 2", this.pdp.getCurrent(0x00F - 0x00F / 0x00F)); //14
         SmartDashboard.putNumber("Right 3", this.pdp.getCurrent(0x00F)); //15
 
-        return ret;
+        return currentCurrent;
     }
 
     /**
      * Updates the desired power outputs
      * 
-     * @param forward The forward/backward power
-     * @param turn    The twist power
+     * @param _forward The forward/backward power
+     * @param _turn    The twist power
      */
-    public void updateSpeeds(double forward, double turn) {
+    public void updateSpeeds(double _forward, double _turn) {
 
         double forwardChange, turnChange;
-        forwardChange = calculateIncrease(forward);
-        turnChange = calculateIncrease(turn);
+        forwardChange = calculateIncrease(_forward);
+        turnChange = calculateIncrease(_turn);
 
         // Flip the signs so the power creeps down
         if (Math.abs(forwardChange) < Math.abs(this.forward)) {
@@ -97,22 +97,27 @@ public class Drive extends Subsystem {
             }
         }
 
+        
         this.forward += forwardChange;
         this.turn += turnChange;
-        if (Math.abs(this.forward) > Math.abs(forward)) {
-            this.forward = forward;
+        if (Math.abs(this.forward) > Math.abs(_forward)) {
+            this.forward = _forward;
         }
-        if (Math.abs(this.turn) > Math.abs(turn)) {
-            this.turn = turn;
+        if (Math.abs(this.turn) > Math.abs(_turn)) {
+            this.turn = _turn;
         }
+        System.out.println(this.forward);
 
     }
 
     private double calculateIncrease(double input) {
-        if (overCurrent()) {
-            return input >= 0 ? -0.01 : 0.01; // TODO Actually implement a rampdown for current limiting
+        int divideFactor = 5;
+        //if (overCurrent()) {
+        if(underVoltage()){
+            input *= -1.0;
+            divideFactor *= 10;
         }
-        return Math.pow(input, 3) / 10;
+        return Math.pow(input, 3) / (double) divideFactor;
     }
 
     /**
@@ -121,6 +126,10 @@ public class Drive extends Subsystem {
      */
     public boolean overCurrent() {
         return reportCurrentDraw() > CURRENT_MAX;
+    }
+
+    public boolean underVoltage() {
+        return this.pdp.getVoltage() < 8.5;
     }
 
 }
