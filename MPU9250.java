@@ -194,19 +194,19 @@ class MPU9250 implements Runnable {
     //GYRO Z END ------------------------------------------------
 
     public int getAccelX(){
-        byte[] buffer = read(0x00, 2);
+        byte[] buffer = read(MPU9250_ADDRESS, 2);
         int xTmp = buffer[0] << 8 | buffer[1];
         return xTmp;
     }
 
     public int getAccelY(){
-        byte[] buffer = read(0x00, 2);
+        byte[] buffer = read(MPU9250_ADDRESS+0x02, 2);
         int yTmp = buffer[0] << 8 | buffer[1];
         return yTmp;
     }
 
     public int getAccelZ(){
-        byte[] buffer = read(0x00, 2);
+        byte[] buffer = read(MPU9250_ADDRESS+0x04, 2);
         int zTmp = buffer[0] << 8 | buffer[1];
         return zTmp;
     }

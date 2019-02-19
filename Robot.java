@@ -84,6 +84,9 @@ public class Robot extends TimedRobot {
 
         //level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
         SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
+        SmartDashboard.putNumber("Accel X", hw.gyro.getAccelX());
+        SmartDashboard.putNumber("Accel Y", hw.gyro.getAccelY());
+        SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
 
         drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         if(dRT > 0.2 || dLT > 0.2) {
