@@ -78,6 +78,11 @@ public class Drive extends Subsystem {
     public void updateSpeeds(double _forward, double _turn, boolean highGear) {
 
         double forwardChange, turnChange;
+        if(_turn >= 0){
+            _turn = Math.pow(_turn, (double)(1/1.4));
+        } else {
+            _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
+        }
         forwardChange = calculateIncrease(_forward, forward, highGear);
         turnChange = calculateIncrease(_turn, turn, highGear);
         
@@ -92,13 +97,13 @@ public class Drive extends Subsystem {
     }
 
     private double calculateIncrease(double input, double currentOutput, boolean highGear) {
-        int divideFactor = 12;
+        int divideFactor = 6;
         double limitedBand = 0.3;
         if(highGear) {
             limitedBand += 0.15;
         }
         if(Math.abs(input) <= limitedBand && Math.abs(currentOutput) <= limitedBand) {
-            divideFactor = 17;
+            divideFactor = 11;
         }
         if (overCurrent() || underVoltage()) {
             input *= -1.0;
@@ -121,9 +126,11 @@ public class Drive extends Subsystem {
 
     public void oneSideTurn(double leftPower, double rightPower){
         if(leftPower > 0 ){
-            this.drive.tankDrive(leftPower/1.125, -0.3);
+            this.drive.arcadeDrive(0, -leftPower/2.0);
+            // this.drive.tankDrive(leftPower/1, -0.3);
         } else {
-            this.drive.tankDrive(-0.3, rightPower/1.125);
+            this.drive.arcadeDrive(0, rightPower/2.0);
+            // this.drive.tankDrive(-0.3, rightPower/1.125);
         }
     }
 

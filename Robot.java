@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
@@ -27,7 +28,7 @@ public class Robot extends TimedRobot {
 
     Toggle shiftToggle;
 
-    PID driveController;
+    //PID driveController;
 
     @Override
     public void robotInit() {
@@ -45,7 +46,9 @@ public class Robot extends TimedRobot {
         shiftToggle = new Toggle();
         hw.gyro.calibrateGX();
 
-        driveController = new PID(1.0, 1.0, 1.0, hw.gyro);
+        //driveController = new PID(1.0, 1.0, 1.0, hw.gyro);
+
+        CameraServer.getInstance().startAutomaticCapture();
     }
 
     @Override
@@ -93,9 +96,11 @@ public class Robot extends TimedRobot {
         //SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
 
         if(dRT > 0.2 || dLT > 0.2) {
-            driveController.disable();
+            //driveController.disable();
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
+        }
+            /*
         } else if(driver.joystick.getYButton()) {
             drive.setTank(true);
             driveController.setSetpoint(0.0);
@@ -120,8 +125,8 @@ public class Robot extends TimedRobot {
             driveController.enable();
             hw.drive.arcadeDrive(0, driveController.output);
             // drive.calculateTurn(hw.gyro.getGyroX(), 270.0);
-        } else {
-            driveController.disable();
+        }*/ else {
+            // driveController.disable();
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
@@ -137,6 +142,6 @@ public class Robot extends TimedRobot {
         drive.disable();
         hatch.disable();
         shift.disable();
-        driveController.disable();
+        // driveController.disable();
     }
 }
