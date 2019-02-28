@@ -6,6 +6,8 @@ class PID implements Runnable {
     private MPU9250 gyro;
     private double setpoint;
 
+    private boolean zeiglerNicholasMethod;
+
     private long lastTimeMeasurement;
     private double previousError;
     private double integral;
@@ -13,11 +15,19 @@ class PID implements Runnable {
     public double output;
     private boolean state;
     
-    public PID(double kP, double kI, double kD, MPU9250 gyro) {
+    /**
+     * @param double kP The tuned proportional value
+     * @param double kI The tuned integral value
+     * @param double kD The tuned derivitive value
+     * @param MPU9250 gyro The sensor used for feedback for the controller
+     * @param boolean zeiglerNicholsMethod True if the K values were calculated to use the non interactive PID method, false for the parallel algorithm.
+     */
+    public PID(double kP, double kI, double kD, MPU9250 gyro, boolean nonInteractiveAlgorithm) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.gyro = gyro;
+        this.zeiglerNicholasMethod = nonInteractiveAlgorithm;
         this.previousError = 0.0;
         this.integral = 0.0;
         this.lastTimeMeasurement = System.nanoTime();
@@ -32,7 +42,11 @@ class PID implements Runnable {
                 double error = this.setpoint - (this.gyro.getGyroX() % 360);
                 this.integral += error * dt;
                 double derivative = (error - this.previousError) / dt;
-                this.output = kP * error + kI * this.integral + kD * derivative;
+                if(this.zeiglerNicholasMethod) {
+                    this.output = this.kP * (error + (1/kI * this.integral) + (kD * derivative));
+                } else {
+                    this.output = kP * error + kI * this.integral + kD * derivative;
+                }
                 this.previousError = error;
                 this.lastTimeMeasurement = System.nanoTime();
             } else {
