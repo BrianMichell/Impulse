@@ -10,13 +10,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.cameraserver.CameraServer;
+// import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
 
     DriverJoystick driver;
-    XboxController secondary;
+    // XboxController secondary;
     
     Hardware hw;
     
@@ -28,12 +28,12 @@ public class Robot extends TimedRobot {
 
     Toggle shiftToggle;
 
-    //PID driveController;
+    PID driveController;
 
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
-        secondary = new XboxController(1);
+        // secondary = new XboxController(1);
         
         hw = new Hardware();
         
@@ -46,9 +46,18 @@ public class Robot extends TimedRobot {
         shiftToggle = new Toggle();
         hw.gyro.calibrateGX();
 
-        //driveController = new PID(1.0, 1.0, 1.0, hw.gyro);
+        //driveController = new PID(10.0, 100000000000.0, 0.0, hw.gyro, true);
+        
+        /*
+        osc period is about 1.25 seconds at Kp = 10.0 Ki = 100000000000 Kd = 0
+        with 50% output damping on total output
+        */
+        //driveController = new PID(10.0/5, 1.25/2, 1.25/3, hw.gyro, true);
+        double Ku = 10.0;
+        double Tu = 1.25;
+        driveController = new PID(Ku/5.0, (2*Ku)/Tu/5, Ku*Tu/15, hw.gyro, true);
 
-        CameraServer.getInstance().startAutomaticCapture();
+        // CameraServer.getInstance().startAutomaticCapture();
     }
 
     @Override
@@ -81,38 +90,36 @@ public class Robot extends TimedRobot {
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
 
-        double theta, phi;
-        theta = secondary.getRawAxis(1);
-        phi = secondary.getRawAxis(5);
-        climber.manualDrive(theta, phi);
+        // double theta, phi;
+        // theta = secondary.getRawAxis(1);
+        // phi = secondary.getRawAxis(5);
+        // climber.manualDrive(theta, phi);
 
         shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
 
-        level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
+        // level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
         SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
         //SmartDashboard.putNumber("Accel X", hw.gyro.getAccelX());
         //SmartDashboard.putNumber("Accel Y", hw.gyro.getAccelY());
         //SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
 
         if(dRT > 0.2 || dLT > 0.2) {
-            //driveController.disable();
+            driveController.disable();
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
-        }
-            /*
         } else if(driver.joystick.getYButton()) {
             drive.setTank(true);
             driveController.setSetpoint(0.0);
             driveController.enable();
             hw.drive.arcadeDrive(0, driveController.output);
-            //drive.calculateTurn(hw.gyro.getGyroX(), 0.0);
+            // drive.calculateTurn(hw.gyro.getGyroX(), 0.0);
         } else if(driver.joystick.getAButton()) {
             drive.setTank(true);
             driveController.setSetpoint(180.0);
             driveController.enable();
             hw.drive.arcadeDrive(0, driveController.output);
-            //drive.calculateTurn(hw.gyro.getGyroX(), 180.0);
+            // drive.calculateTurn(hw.gyro.getGyroX(), 180.0);
         } else if(driver.joystick.getXButton()) {
             drive.setTank(true);
             driveController.setSetpoint(90.0);
@@ -125,8 +132,8 @@ public class Robot extends TimedRobot {
             driveController.enable();
             hw.drive.arcadeDrive(0, driveController.output);
             // drive.calculateTurn(hw.gyro.getGyroX(), 270.0);
-        }*/ else {
-            // driveController.disable();
+        } else {
+            driveController.disable();
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
