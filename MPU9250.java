@@ -104,7 +104,7 @@ class MPU9250 implements Runnable {
         int changeAccumulator = 0;
         double samples = 25;
         for (int i = 0; i < samples; i++) {
-            byte[] tmp = read(0x47, 2);
+            byte[] tmp = read(0x43, 2);
             changeAccumulator += (tmp[0] << 8 | tmp[1]);
         }
         this.biasGX = -(int) (changeAccumulator / samples);
@@ -117,7 +117,7 @@ class MPU9250 implements Runnable {
     }
 
     public double getGXRate() {
-        byte[] dataBuffer = read(0x47, 2); // TODO Change this back to X-axis instead of Z-axis
+        byte[] dataBuffer = read(0x43, 2); // TODO Change this back to X-axis instead of Z-axis
         int xTmp = dataBuffer[0] << 8 | dataBuffer[1];
         xTmp += biasGX;
         xTmp /= scale;
