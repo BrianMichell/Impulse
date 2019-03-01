@@ -22,7 +22,7 @@ class PID implements Runnable {
      * @param double kI The tuned integral value
      * @param double kD The tuned derivitive value
      * @param MPU9250 gyro The sensor used for feedback for the controller
-     * @param boolean zeiglerNicholsMethod True if the K values were calculated to use the non interactive PID method, false for the parallel algorithm.
+     * @param boolean nonInteractiveAlgorithm True if the K values were calculated to use the non interactive PID method, false for the parallel algorithm.
      */
     public PID(double kP, double kI, double kD, MPU9250 gyro, boolean nonInteractiveAlgorithm) {
         this.kP = kP;
