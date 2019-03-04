@@ -28,7 +28,8 @@ public class Robot extends TimedRobot {
 
     Toggle shiftToggle;
 
-    PID driveController;
+    // PID driveController;
+    PID ankleController, kneeController;
 
     @Override
     public void robotInit() {
@@ -57,13 +58,16 @@ public class Robot extends TimedRobot {
         //double Tu = 1.25;
         //driveController = new PID(Ku/5.0, (2*Ku)/Tu/5, Ku*Tu/15, hw.gyro, true);
 
-        double Tu = 0.5;
-        double Ku = 20.0;
+        // double Tu = 0.5;
+        // double Ku = 20.0;
         // driveController = new PID(20.0, 0.0, 0.0, hw.gyro, false);
         // driveController = new PID(Ku/5.0, Tu/2.0, Tu/3.0, hw.gyro, true);
         // driveController = new PID(Ku/5.0, (2*Ku)/Tu/5.0, Ku*Tu/15.0, hw.gyro, true);
-        driveController = new PID(Ku/5.0, 0, Tu/3.0, hw.gyro, true);
+        // driveController = new PID(Ku/5.0, 0, Tu/3.0, hw.gyro, true);
         // driveController = new PID(Ku/5.0, 0, Ku*Tu/15.0, hw.gyro, true);
+
+        ankleController = new PID(0.05, 0.0, 0.0, hw.ankleEncoder, false, 0.85);
+        kneeController = new PID(0.05, 0.0, 0.0, hw.kneeEncoder, false, 1.0);
 
         // CameraServer.getInstance().startAutomaticCapture();
     }
@@ -113,9 +117,12 @@ public class Robot extends TimedRobot {
         //SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
 
         if(dRT > 0.2 || dLT > 0.2) {
-            driveController.disable();
+            // driveController.disable();
+            ankleController.disable();
+            kneeController.disable();
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
+        /*
         } else if(driver.joystick.getYButton()) {
             drive.setTank(true);
             driveController.setSetpoint(0.0);
@@ -140,8 +147,10 @@ public class Robot extends TimedRobot {
             driveController.enable();
             hw.drive.arcadeDrive(0, driveController.output);
             // drive.calculateTurn(hw.gyro.getGyroX(), 270.0);
+            */
         } else {
-            driveController.disable();
+            ankleController.disable();
+            kneeController.disable();
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
