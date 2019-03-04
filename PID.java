@@ -13,7 +13,7 @@ class PID implements Runnable {
 
     private long lastTimeMeasurement;
     private double previousError;
-    private double integral;
+    // private double integral;
 
     public double output;
     private boolean state;
@@ -38,7 +38,7 @@ class PID implements Runnable {
         this.gyro = gyro;
         this.nonInteractiveAlgorithm = nonInteractiveAlgorithm;
         this.previousError = 0.0;
-        this.integral = 0.0;
+        // this.integral = 0.0;
         this.lastTimeMeasurement = System.nanoTime();
         this.setpoint = 0.0;
         this.output = 0.0;
@@ -54,7 +54,7 @@ class PID implements Runnable {
                 long now = System.nanoTime();
                 double dt = (now - this.lastTimeMeasurement) / (double) 1000000000; //Change of time (in seconds)
                 double error = this.setpoint - this.gyro.getGyroX();
-                this.integral += error * dt; //Add to the rieman sum
+                // this.integral += error * dt; //Add to the rieman sum
                 double derivative = (error - this.previousError) / dt;
                 
                 if(this.nonInteractiveAlgorithm) {
@@ -63,7 +63,8 @@ class PID implements Runnable {
                     // this.output = this.kP * (error + (1/kI * this.integral) + (kD * derivative)); //TODO This need to have a Laplace transform
                     // output = kP * (error + (1/kI * integral) + (kD * derivative));
                 } else {
-                    this.output = normalize(kP * error + kI * this.integral + kD * derivative);
+                    // this.output = normalize(kP * error + kI * this.integral + kD * derivative);
+                    this.output = normalize(kP * error + kD * derivative);
                 }
                 
                 this.previousError = error;
@@ -72,7 +73,6 @@ class PID implements Runnable {
                 lastTimeMeasurement = System.nanoTime();
             }
             SmartDashboard.putNumber("PID output", this.output);
-            Timer.delay(0.05);
         }
     }
 
