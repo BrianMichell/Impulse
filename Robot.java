@@ -53,9 +53,17 @@ public class Robot extends TimedRobot {
         with 50% output damping on total output
         */
         //driveController = new PID(10.0/5, 1.25/2, 1.25/3, hw.gyro, true);
-        double Ku = 10.0;
-        double Tu = 1.25;
-        driveController = new PID(Ku/5.0, (2*Ku)/Tu/5, Ku*Tu/15, hw.gyro, true);
+        //double Ku = 10.0;
+        //double Tu = 1.25;
+        //driveController = new PID(Ku/5.0, (2*Ku)/Tu/5, Ku*Tu/15, hw.gyro, true);
+
+        double Tu = 0.5;
+        double Ku = 20.0;
+        // driveController = new PID(20.0, 0.0, 0.0, hw.gyro, false);
+        // driveController = new PID(Ku/5.0, Tu/2.0, Tu/3.0, hw.gyro, true);
+        // driveController = new PID(Ku/5.0, (2*Ku)/Tu/5.0, Ku*Tu/15.0, hw.gyro, true);
+        driveController = new PID(Ku/5.0, 0, Tu/3.0, hw.gyro, true);
+        // driveController = new PID(Ku/5.0, 0, Ku*Tu/15.0, hw.gyro, true);
 
         // CameraServer.getInstance().startAutomaticCapture();
     }
