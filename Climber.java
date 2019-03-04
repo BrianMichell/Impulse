@@ -15,9 +15,6 @@ class Climber extends Subsystem {
 
     SpeedControllerGroup ankle, knee;
 
-    private double linkageOneSpeed;
-    private double linkageTwoSpeed;
-
     private int stage;
     private final int DISABLED = 0;
     private final int STAGE_ONE = 1;
@@ -34,8 +31,6 @@ class Climber extends Subsystem {
         this.ankleEncoder = hw.ankleEncoder;
         this.kneeEncoder = hw.kneeEncoder;
         this.stage = this.DISABLED;
-        this.linkageOneSpeed = 0.0;
-        this.linkageTwoSpeed = 0.0;
         this.ankle = hw.ankle;
         this.knee = hw.knee;
     }
@@ -94,8 +89,8 @@ class Climber extends Subsystem {
 
     @Override
     protected void haltSystem(){
-        this.linkageOneSpeed = 0.0;
-        this.linkageTwoSpeed = 0.0;
+        this.ankle.disable();
+        this.knee.disable();
     }
 
     /**
