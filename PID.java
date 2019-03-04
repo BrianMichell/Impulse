@@ -17,6 +17,8 @@ class PID implements Runnable {
 
     public double output;
     private boolean state;
+
+    private double MAX_OUTPUT;
     
     /**
      * @param double kP The tuned proportional value
@@ -26,6 +28,10 @@ class PID implements Runnable {
      * @param boolean nonInteractiveAlgorithm True if the K values were calculated to use the non interactive PID method, false for the parallel algorithm.
      */
     public PID(double kP, double kI, double kD, MPU9250 gyro, boolean nonInteractiveAlgorithm) {
+        this(kP, kI, kD, gyro, nonInteractiveAlgorithm, 1.0);
+    }
+    
+    public PID(double kP, double kI, double kD, MPU9250 gyro, boolean nonInteractiveAlgorithm, double maxOutput){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
@@ -37,7 +43,9 @@ class PID implements Runnable {
         this.setpoint = 0.0;
         this.output = 0.0;
         this.state = false;
+        this.MAX_OUTPUT = maxOutput;
         new Thread(this, "PID controller").start();
+        
     }
 
     public void run(){
@@ -78,6 +86,10 @@ class PID implements Runnable {
 
     public void disable() {
         this.state = false;
+    }
+
+    private double normalize(double value){
+        return Math.max(-this.MAX_OUTPUT, Math.min(value, this.MAX_OUTPUT));
     }
 
 }
