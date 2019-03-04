@@ -1,12 +1,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 
 class PID implements Runnable {
 
     private double kP, kI, kD;
-    private MPU9250 gyro;
+    private Encoder encoder;
     private double setpoint;
 
     private boolean nonInteractiveAlgorithm;
@@ -27,15 +28,15 @@ class PID implements Runnable {
      * @param MPU9250 gyro The sensor used for feedback for the controller
      * @param boolean nonInteractiveAlgorithm True if the K values were calculated to use the non interactive PID method, false for the parallel algorithm.
      */
-    public PID(double kP, double kI, double kD, MPU9250 gyro, boolean nonInteractiveAlgorithm) {
-        this(kP, kI, kD, gyro, nonInteractiveAlgorithm, 1.0);
+    public PID(double kP, double kI, double kD, Encoder encoder, boolean nonInteractiveAlgorithm) {
+        this(kP, kI, kD, encoder, nonInteractiveAlgorithm, 1.0);
     }
     
-    public PID(double kP, double kI, double kD, MPU9250 gyro, boolean nonInteractiveAlgorithm, double maxOutput){
+    public PID(double kP, double kI, double kD, Encoder encoder, boolean nonInteractiveAlgorithm, double maxOutput){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
-        this.gyro = gyro;
+        this.encoder = encoder;
         this.nonInteractiveAlgorithm = nonInteractiveAlgorithm;
         this.previousError = 0.0;
         // this.integral = 0.0;
@@ -53,7 +54,7 @@ class PID implements Runnable {
             if(this.state){
                 long now = System.nanoTime();
                 double dt = (now - this.lastTimeMeasurement) / (double) 1000000000; //Change of time (in seconds)
-                double error = this.setpoint - this.gyro.getGyroX();
+                double error = this.setpoint - this.encoder.get();
                 // this.integral += error * dt; //Add to the rieman sum
                 double derivative = (error - this.previousError) / dt;
                 
