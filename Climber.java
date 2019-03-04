@@ -3,17 +3,17 @@ package frc.robot;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 
 
 class Climber extends Subsystem {
 
     DriverStation ds;
     BuiltInAccelerometer accelerometer;
-    Encoder encoderPhi;
-    Encoder encoderTheta;
+    Encoder ankleEncoder;
+    Encoder kneeEncoder;
 
-    VictorSP theatOne, thetaTwo, phiOne, phiTwo;
+    SpeedControllerGroup ankle, knee;
 
     private double linkageOneSpeed;
     private double linkageTwoSpeed;
@@ -31,15 +31,13 @@ class Climber extends Subsystem {
         super(hw, "Climber");
         this.ds = DriverStation.getInstance();
         this.accelerometer = hw.accelerometer;
-        this.encoderPhi = hw.encoderPhi;
-        this.encoderTheta = hw.encoderTheta;
+        this.ankleEncoder = hw.ankleEncoder;
+        this.kneeEncoder = hw.kneeEncoder;
         this.stage = this.DISABLED;
         this.linkageOneSpeed = 0.0;
         this.linkageTwoSpeed = 0.0;
-        this.thetaTwo = hw.thetaTwo;
-        this.theatOne = hw.thetaOne;
-        this.phiOne = hw.phiOne;
-        this.phiTwo = hw.phiTwo;
+        this.ankle = hw.ankle;
+        this.knee = hw.knee;
     }
 
     @Override
@@ -49,11 +47,9 @@ class Climber extends Subsystem {
         }
     }
 
-    public void manualDrive(double theta, double phi){
-        thetaTwo.set(theta);
-        theatOne.set(theta);
-        phiOne.set(phi);
-        phiTwo.set(phi);
+    public void manualDrive(double ankleSpeed, double kneeSpeed){
+        ankle.set(ankleSpeed);
+        knee.set(kneeSpeed);
     }
 
     private void climb(){
@@ -123,14 +119,8 @@ class Climber extends Subsystem {
      * @param theta Theta is the desired angle closer to the bot (linkageOne)
      * @param phi Phi is the desired angle closer to the foot (linkageTwo)
      */
-    private void setAngles(int theta, int phi){
-        double currentTheta = encoderTheta.getDistance();
-        double currentPhi = encoderPhi.getDistance();
-        double speedTheta = theta - currentTheta;
-        double speedPhi = phi - currentPhi;
-
-        speedTheta /= RATE;
-        speedPhi /= RATE;
+    @Deprecated
+    private void setAngles(int ankleAngle, int kneeAngle){
         
     }
 

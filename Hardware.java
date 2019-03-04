@@ -12,9 +12,10 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class Hardware {
 
     // Motors
-    public final VictorSP leftDrive1, leftDrive2, rightDrive1, rightDrive2;
+    private final VictorSP leftDrive1, leftDrive2, rightDrive1, rightDrive2;
     public final DifferentialDrive drive;
-    public final VictorSP thetaOne, thetaTwo, phiOne, phiTwo;
+    private final VictorSP ankleOne, ankleTwo, kneeOne, kneeTwo;
+    public final SpeedControllerGroup ankle, knee;
 
     // Pneumatics
     public final Compressor compressor = new Compressor();
@@ -23,7 +24,7 @@ public class Hardware {
     public final DoubleSolenoid climberPistons = new DoubleSolenoid(5, 7);
 
     // Encoders
-    public final Encoder encoderTheta, encoderPhi;
+    public final Encoder ankleEncoder, kneeEncoder;
     
     // Sensors
     public final BuiltInAccelerometer accelerometer;
@@ -44,22 +45,22 @@ public class Hardware {
 
         drive = new DifferentialDrive(left, right);
 
-        thetaOne = new VictorSP(5);
-        thetaTwo = new VictorSP(6);
-        phiOne = new VictorSP(7);
-        phiTwo = new VictorSP(8);
+        ankleOne = new VictorSP(5);
+        ankleTwo = new VictorSP(6);
+        kneeOne = new VictorSP(7);
+        kneeTwo = new VictorSP(8);
+        ankle = new SpeedControllerGroup(ankleOne, ankleTwo);
+        knee = new SpeedControllerGroup(kneeOne, kneeTwo);
 
         // Encoders
-        encoderTheta = new Encoder(0, 1);
-        encoderPhi = new Encoder(2, 3);
+        ankleEncoder = new Encoder(0, 1);
+        kneeEncoder = new Encoder(2, 3);
 
         // Sensors
         accelerometer = new BuiltInAccelerometer();
         pdp = new PowerDistributionPanel(0);
         gyro = new MPU9250();
 
-        thetaTwo.setInverted(true);
-        phiTwo.setInverted(true);
     }
 
 }
