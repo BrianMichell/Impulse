@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 
 class PID implements Runnable {
 
@@ -49,13 +50,13 @@ class PID implements Runnable {
                 double derivative = (error - this.previousError) / dt;
                 
                 if(this.nonInteractiveAlgorithm) {
-                    this.output = this.kP * (error + (1/kI * this.integral) + (kD * derivative)); //TODO This need to have a Laplace transform
-                    //output = kP * (error + (1/kI * integral) + (kD * derivative));
+                    this.output = this.kP * ((this.kD * this.kI * Math.pow(error, 2) + this.kI * error + 1) / 1 * error);
+                    // this.output = this.kP * ((kD * kI * Math.pow(error, 2) + kI * error + 1) / kI * error);
+                    // this.output = this.kP * (error + (1/kI * this.integral) + (kD * derivative)); //TODO This need to have a Laplace transform
+                    // output = kP * (error + (1/kI * integral) + (kD * derivative));
                 } else {
                     this.output = kP * error + kI * this.integral + kD * derivative;
                 }
-                
-                this.output *= 0.5; //Half the calculated input
                 
                 this.previousError = error;
                 this.lastTimeMeasurement = System.nanoTime();
@@ -63,6 +64,7 @@ class PID implements Runnable {
                 lastTimeMeasurement = System.nanoTime();
             }
             SmartDashboard.putNumber("PID output", this.output);
+            Timer.delay(0.05);
         }
     }
 
