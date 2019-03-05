@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class Hardware {
 
     // Motors
-    private final VictorSP leftDrive1, leftDrive2, rightDrive1, rightDrive2;
+    private final VictorSPX2 leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
     public final DifferentialDrive drive;
     private final VictorSP ankleOne, ankleTwo, kneeOne, kneeTwo;
     public final SpeedControllerGroup ankle, knee;
@@ -35,20 +35,22 @@ public class Hardware {
 
     public Hardware() {
         // Motors
-        leftDrive1 = new VictorSP(0);
-        leftDrive2 = new VictorSP(1);
-        rightDrive1 = new VictorSP(2);
-        rightDrive2 = new VictorSP(3);
+        leftDrive1 = new VictorSPX2(1);
+        leftDrive2 = new VictorSPX2(2);
+        leftDrive3 = new VictorSPX2(3);
+        rightDrive1 = new VictorSPX2(4);
+        rightDrive2 = new VictorSPX2(5);
+        rightDrive3 = new VictorSPX2(6);
 
-        SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2);
-        SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2);
+        SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2, leftDrive3);
+        SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2, rightDrive3);
 
         drive = new DifferentialDrive(left, right);
 
-        ankleOne = new VictorSP(5);
-        ankleTwo = new VictorSP(6);
-        kneeOne = new VictorSP(7);
-        kneeTwo = new VictorSP(8);
+        ankleOne = new VictorSP(1);
+        ankleTwo = new VictorSP(2);
+        kneeOne = new VictorSP(3);
+        kneeTwo = new VictorSP(4);
         ankle = new SpeedControllerGroup(ankleOne, ankleTwo);
         knee = new SpeedControllerGroup(kneeOne, kneeTwo);
 
