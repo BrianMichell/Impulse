@@ -10,8 +10,6 @@ class PID implements Runnable {
     private Encoder encoder;
     private double setpoint;
 
-    private boolean nonInteractiveAlgorithm;
-
     private long lastTimeMeasurement;
     private double previousError;
     // private double integral;
@@ -19,32 +17,33 @@ class PID implements Runnable {
     public double output;
     private boolean state;
 
-    private double MAX_OUTPUT;
+    private double maxOutput;
     
     /**
      * @param double kP The tuned proportional value
      * @param double kI The tuned integral value
      * @param double kD The tuned derivitive value
-     * @param MPU9250 gyro The sensor used for feedback for the controller
-     * @param boolean nonInteractiveAlgorithm True if the K values were calculated to use the non interactive PID method, false for the parallel algorithm.
+     * @param Encoder encoder The sensor used for feedback for the controller
      */
-    public PID(double kP, double kI, double kD, Encoder encoder, boolean nonInteractiveAlgorithm) {
-        this(kP, kI, kD, encoder, nonInteractiveAlgorithm, 1.0);
+    public PID(double kP, double kI, double kD, Encoder encoder) {
+        this(kP, kI, kD, encoder, 1.0);
     }
     
-    public PID(double kP, double kI, double kD, Encoder encoder, boolean nonInteractiveAlgorithm, double maxOutput){
+    /**
+     * @param double maxOutput The absolute value of the maximum power able to be applied by the controller
+     */
+    public PID(double kP, double kI, double kD, Encoder encoder, double maxOutput){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.encoder = encoder;
-        this.nonInteractiveAlgorithm = nonInteractiveAlgorithm;
         this.previousError = 0.0;
         // this.integral = 0.0;
         this.lastTimeMeasurement = System.nanoTime();
         this.setpoint = 0.0;
         this.output = 0.0;
         this.state = false;
-        this.MAX_OUTPUT = maxOutput;
+        this.maxOutput = maxOutput;
         new Thread(this, "PID controller").start();
         
     }
@@ -58,15 +57,8 @@ class PID implements Runnable {
                 // this.integral += error * dt; //Add to the rieman sum
                 double derivative = (error - this.previousError) / dt;
                 
-                if(this.nonInteractiveAlgorithm) {
-                    this.output = normalize(this.kP * ((this.kD * this.kI * Math.pow(error, 2) + this.kI * error + 1) / 1 * error));
-                    // this.output = this.kP * ((kD * kI * Math.pow(error, 2) + kI * error + 1) / kI * error);
-                    // this.output = this.kP * (error + (1/kI * this.integral) + (kD * derivative)); //TODO This need to have a Laplace transform
-                    // output = kP * (error + (1/kI * integral) + (kD * derivative));
-                } else {
-                    // this.output = normalize(kP * error + kI * this.integral + kD * derivative);
-                    this.output = normalize(kP * error + kD * derivative);
-                }
+                // this.output = normalize(kP * error + kI * this.integral + kD * derivative);
+                this.output = normalize(kP * error + kD * derivative);
                 
                 this.previousError = error;
                 this.lastTimeMeasurement = System.nanoTime();
@@ -81,6 +73,10 @@ class PID implements Runnable {
         this.setpoint = setpoint;
     }
 
+    public void setPercentOutput(double percentOutput){
+        this.maxOutput = percentOutput;
+    }
+
     public void enable() {
         this.state = true;
     }
@@ -90,7 +86,22 @@ class PID implements Runnable {
     }
 
     private double normalize(double value){
-        return Math.max(-this.MAX_OUTPUT, Math.min(value, this.MAX_OUTPUT));
+        return Math.max(-this.maxOutput, Math.min(value, this.maxOutput));
+    }
+
+    /**
+     * If the plant is within +-5% of the target and outputting less than +-10% the
+     * system is presumed to be at steadystate.
+     */
+    public boolean isSteadyState(){
+        double percentError = (Math.abs(this.encoder.get() - this.setpoint) / this.setpoint) * 100.0;
+        return (percentError <= 5 && Math.abs(this.output) < 0.1);
+    }
+
+    public void setGains(double kP, double kI, double kD){
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
     }
 
 }

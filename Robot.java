@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 public class Robot extends TimedRobot {
 
     DriverJoystick driver;
-    // XboxController secondary;
+    XboxController secondary;
     
     Hardware hw;
     
@@ -28,13 +28,10 @@ public class Robot extends TimedRobot {
 
     Toggle shiftToggle;
 
-    // PID driveController;
-    PID ankleController, kneeController;
-
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
-        // secondary = new XboxController(1);
+        secondary = new XboxController(1);
         
         hw = new Hardware();
         
@@ -46,28 +43,6 @@ public class Robot extends TimedRobot {
 
         shiftToggle = new Toggle();
         hw.gyro.calibrateGX();
-
-        //driveController = new PID(10.0, 100000000000.0, 0.0, hw.gyro, true);
-        
-        /*
-        osc period is about 1.25 seconds at Kp = 10.0 Ki = 100000000000 Kd = 0
-        with 50% output damping on total output
-        */
-        //driveController = new PID(10.0/5, 1.25/2, 1.25/3, hw.gyro, true);
-        //double Ku = 10.0;
-        //double Tu = 1.25;
-        //driveController = new PID(Ku/5.0, (2*Ku)/Tu/5, Ku*Tu/15, hw.gyro, true);
-
-        // double Tu = 0.5;
-        // double Ku = 20.0;
-        // driveController = new PID(20.0, 0.0, 0.0, hw.gyro, false);
-        // driveController = new PID(Ku/5.0, Tu/2.0, Tu/3.0, hw.gyro, true);
-        // driveController = new PID(Ku/5.0, (2*Ku)/Tu/5.0, Ku*Tu/15.0, hw.gyro, true);
-        // driveController = new PID(Ku/5.0, 0, Tu/3.0, hw.gyro, true);
-        // driveController = new PID(Ku/5.0, 0, Ku*Tu/15.0, hw.gyro, true);
-
-        ankleController = new PID(0.05, 0.0, 0.0, hw.ankleEncoder, false, 0.85);
-        kneeController = new PID(0.05, 0.0, 0.0, hw.kneeEncoder, false, 1.0);
 
         // CameraServer.getInstance().startAutomaticCapture();
     }
@@ -112,45 +87,14 @@ public class Robot extends TimedRobot {
 
         // level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
         SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
-        //SmartDashboard.putNumber("Accel X", hw.gyro.getAccelX());
-        //SmartDashboard.putNumber("Accel Y", hw.gyro.getAccelY());
-        //SmartDashboard.putNumber("Accel Z", hw.gyro.getAccelZ());
 
         if(dRT > 0.2 || dLT > 0.2) {
-            // driveController.disable();
-            ankleController.disable();
-            kneeController.disable();
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
-        /*
-        } else if(driver.joystick.getYButton()) {
-            drive.setTank(true);
-            driveController.setSetpoint(0.0);
-            driveController.enable();
-            hw.drive.arcadeDrive(0, driveController.output);
-            // drive.calculateTurn(hw.gyro.getGyroX(), 0.0);
-        } else if(driver.joystick.getAButton()) {
-            drive.setTank(true);
-            driveController.setSetpoint(180.0);
-            driveController.enable();
-            hw.drive.arcadeDrive(0, driveController.output);
-            // drive.calculateTurn(hw.gyro.getGyroX(), 180.0);
-        } else if(driver.joystick.getXButton()) {
-            drive.setTank(true);
-            driveController.setSetpoint(90.0);
-            driveController.enable();
-            hw.drive.arcadeDrive(0, driveController.output);
-            // drive.calculateTurn(hw.gyro.getGyroX(), 90.0);
-        } else if(driver.joystick.getBButton()) {
-            drive.setTank(true);
-            driveController.setSetpoint(270.0);
-            driveController.enable();
-            hw.drive.arcadeDrive(0, driveController.output);
-            // drive.calculateTurn(hw.gyro.getGyroX(), 270.0);
-            */
+        } else if(secondary.getAButton() && secondary.getBButton()) { //Hold both buttons to begin climb
+            drive.updateSpeeds(Math.abs(DriverJoystick.getForward()), Math.abs(DriverJoystick.getTurn()), false); //Limit driver control to forward only
+            climber.requestClimb(true);
         } else {
-            ankleController.disable();
-            kneeController.disable();
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
