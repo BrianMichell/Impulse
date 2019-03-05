@@ -8,43 +8,43 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
 
-    /*
     DriverJoystick driver;
+    XboxController secondary;
     
     Hardware hw;
     
     Climber climber;
+    Level2 level2;
     Drive drive;
     Hatch hatch;
     Shifter shift;
 
-    Toggle toggle;
-
-    EnergyLogger logger;
-    */
-
-    MPU9250 gyro;
+    Toggle shiftToggle;
 
     @Override
     public void robotInit() {
-        //driver = new DriverJoystick(0);
+        driver = new DriverJoystick(0);
+        secondary = new XboxController(1);
         
-        //hw = new Hardware();
+        hw = new Hardware();
         
-        //climber = new Climber(hw);
-        //drive = new Drive(hw);
-        //hatch = new Hatch(hw);
-        //shift = new Shifter(hw);
+        climber = new Climber(hw);
+        level2 = new Level2(hw);
+        drive = new Drive(hw);
+        hatch = new Hatch(hw);
+        shift = new Shifter(hw);
 
-        //toggle = new Toggle();
+        shiftToggle = new Toggle();
+        hw.gyro.calibrateGX();
 
-        //logger = new EnergyLogger(hw, drive);
-
-        gyro = new MPU9250();
+        // CameraServer.getInstance().startAutomaticCapture();
     }
 
     @Override
@@ -63,46 +63,53 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit(){
-        /*
         climber.enable();
         drive.enable();
         hatch.enable();
         shift.enable();
-
-        if(logger.status == logger.DISABLED){
-            logger.enable();
-        }
-        */
     }
 
     @Override
     public void teleopPeriodic() {
         //Collect all joystick inputs
-        //boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
+        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
+        boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
+        double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
+        double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
 
-        //shift.setInHighGear(toggle.update(dRB));
+        // double theta, phi;
+        // theta = secondary.getRawAxis(1);
+        // phi = secondary.getRawAxis(5);
+        // climber.manualDrive(theta, phi);
 
-        //drive.updateSpeeds(driver.getForward(), driver.getTurn());
+        shift.setInHighGear(shiftToggle.update(dRB));
+        hatch.setOpen(dLB);
+
+        // level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
+        SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
+
+        if(dRT > 0.2 || dLT > 0.2) {
+            drive.setTank(true);
+            drive.oneSideTurn(dLT, dRT);
+        } else if(secondary.getAButton() && secondary.getBButton()) { //Hold both buttons to begin climb
+            drive.updateSpeeds(Math.abs(DriverJoystick.getForward()), Math.abs(DriverJoystick.getTurn()), false); //Limit driver control to forward only
+            climber.requestClimb(true);
+        } else {
+            drive.setTank(false);
+            drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
+        }
     }
 
     @Override
     public void testPeriodic() {
-        //gyro.printData();
-        //gyro.printAccel();
-        //gyro.printGyro();
-        gyro.getGyroX();
     }
 
     @Override
     public void disabledPeriodic(){
-        /*
         climber.disable();
         drive.disable();
         hatch.disable();
         shift.disable();
-        if(logger.status == logger.ENABLED){
-            logger.status = logger.SAVE;
-        }
-        */
+        // driveController.disable();
     }
 }

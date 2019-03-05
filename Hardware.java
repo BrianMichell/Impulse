@@ -3,71 +3,66 @@ package frc.robot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Talon;
-
-//import com.ctre.phoenix.motorcontrol.can.*;
-
-/*
-public interface Hardware {
-    public final SpeedControllerGroup leftDrive = new SpeedControllerGroup(new Victor(2), new Victor(3));
-    public final SpeedControllerGroup rightDrive =  new SpeedControllerGroup(new Victor(0), new Victor(1));
-    public final DifferentialDrive drive = new DifferentialDrive(leftDrive, rightDrive);
-    public final PowerDistributionPanel pdp = new PowerDistributionPanel(0);
-}
-*/
+import edu.wpi.first.wpilibj.VictorSP;
 
 public class Hardware {
 
     // Motors
-    // public final SpeedControllerGroup leftDrive = new SpeedControllerGroup(new
-    // Victor(2), new Victor(3));
-    // public final SpeedControllerGroup rightDrive = new SpeedControllerGroup(new
-    // Victor(0), new Victor(1));
-    public final Talon leftDrive, rightDrive;
+    private final VictorSPX2 leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
     public final DifferentialDrive drive;
-    public final Victor thetaOne, thetaTwo, phiOne, phiTwo;
+    private final VictorSP ankleOne, ankleTwo, kneeOne, kneeTwo;
+    public final SpeedControllerGroup ankle, knee;
 
     // Pneumatics
-    // public final Compressor compressor = new Compressor();
-    // public final DoubleSolenoid leftShift = new DoubleSolenoid(0, 1);
-    // public final DoubleSolenoid rightShift = new DoubleSolenoid(2, 3);
+    public final Compressor compressor = new Compressor();
+    public final DoubleSolenoid shifter = new DoubleSolenoid(0, 1);
+    public final DoubleSolenoid hatchClamp = new DoubleSolenoid(4, 6);
+    public final DoubleSolenoid climberPistons = new DoubleSolenoid(5, 7);
 
     // Encoders
-    public final Encoder encoderTheta, encoderPhi;
+    public final Encoder ankleEncoder, kneeEncoder;
     
     // Sensors
     public final BuiltInAccelerometer accelerometer;
     public final PowerDistributionPanel pdp;
+    public final MPU9250 gyro;
 
     protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
 
     public Hardware() {
         // Motors
-        leftDrive = new Talon(0);
-        rightDrive = new Talon(1);
+        leftDrive1 = new VictorSPX2(1);
+        leftDrive2 = new VictorSPX2(2);
+        leftDrive3 = new VictorSPX2(3);
+        rightDrive1 = new VictorSPX2(4);
+        rightDrive2 = new VictorSPX2(5);
+        rightDrive3 = new VictorSPX2(6);
 
-        drive = new DifferentialDrive(leftDrive, rightDrive);
+        SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2, leftDrive3);
+        SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2, rightDrive3);
 
-        thetaOne = new Victor(4);
-        thetaTwo = new Victor(5);
-        phiOne = new Victor(6);
-        phiTwo = new Victor(7);
+        drive = new DifferentialDrive(left, right);
+
+        ankleOne = new VictorSP(1);
+        ankleTwo = new VictorSP(2);
+        kneeOne = new VictorSP(3);
+        kneeTwo = new VictorSP(4);
+        ankle = new SpeedControllerGroup(ankleOne, ankleTwo);
+        knee = new SpeedControllerGroup(kneeOne, kneeTwo);
 
         // Encoders
-        encoderTheta = new Encoder(0, 1);
-        encoderPhi = new Encoder(2, 3);
+        ankleEncoder = new Encoder(0, 1);
+        kneeEncoder = new Encoder(2, 3);
 
         // Sensors
         accelerometer = new BuiltInAccelerometer();
         pdp = new PowerDistributionPanel(0);
+        gyro = new MPU9250();
 
-        thetaTwo.setInverted(true);
-        phiTwo.setInverted(true);
     }
 
 }

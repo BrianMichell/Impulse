@@ -3,16 +3,18 @@ package frc.robot;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 class Climber extends Subsystem {
 
     DriverStation ds;
     BuiltInAccelerometer accelerometer;
-    Encoder encoderPhi;
-    Encoder encoderTheta;
+    Encoder ankleEncoder;
+    Encoder kneeEncoder;
 
-    private double linkageOneSpeed;
-    private double linkageTwoSpeed;
+    SpeedControllerGroup ankle, knee;
 
     private int stage;
     private final int DISABLED = 0;
@@ -21,24 +23,45 @@ class Climber extends Subsystem {
     private final int STAGE_THREE = 3;
     private final int FINALIZE = 4;
 
-    private final double RATE = 50.0;
+    private final double ANKLE_MAX_OUTPUT = 0.72;
+
+    private final PID ankleController, kneeController;
+
+    private boolean climbRequested;
+    private boolean climbInitiated;
 
     public Climber(Hardware hw){
         super(hw, "Climber");
         this.ds = DriverStation.getInstance();
         this.accelerometer = hw.accelerometer;
-        this.encoderPhi = hw.encoderPhi;
-        this.encoderTheta = hw.encoderTheta;
+        this.ankleEncoder = hw.ankleEncoder;
+        this.kneeEncoder = hw.kneeEncoder;
         this.stage = this.DISABLED;
-        this.linkageOneSpeed = 0.0;
-        this.linkageTwoSpeed = 0.0;
+        this.ankle = hw.ankle;
+        this.knee = hw.knee;
+        this.ankleController = new PID(0.05, 0.0, 0.0, this.ankleEncoder, 0.72);
+        this.kneeController = new PID(0.05, 0.0, 0.0, this.kneeEncoder);
+        this.climbRequested = false;
+        this.climbInitiated = false;
     }
 
     @Override
-    protected void actions(){
-        if(isEndgame()){
-            climb();
+    protected void actions() {
+        SmartDashboard.putBoolean("Climb requested", this.climbRequested);
+        SmartDashboard.putBoolean("Climb initiated", this.climbInitiated);
+
+        if(isEndgame() && this.climbRequested){
+            if(!this.climbInitiated){
+                this.stage = STAGE_ONE;
+                climb();
+                this.climbInitiated = true;
+            }
         }
+    }
+
+    public void manualDrive(double ankleSpeed, double kneeSpeed){
+        ankle.set(ankleSpeed);
+        knee.set(kneeSpeed);
     }
 
     private void climb(){
@@ -46,45 +69,66 @@ class Climber extends Subsystem {
             case DISABLED:
                 haltSystem();
                 break;
-            case STAGE_ONE:
-                if(isTipping()){
-                    recover();
-                } else {
-                    setAngles(0,0);
+            case STAGE_ONE: // Tip back for liftoff (Shift CG over the foot)
+                while(!this.ankleController.isSteadyState() || !this.kneeController.isSteadyState()){
+                    if(isTipping()){
+                        recover();
+                    } else {
+                        // this.ankleController.setGains(0.05, 0.0, 0.0);
+                        // this.kneeController.setGains(0.05, 0.0, 0.0);
+                        this.ankleController.setSetpoint(6144);
+                        this.kneeController.setSetpoint(0);
+                    }
                 }
-                break;
-            case STAGE_TWO:
-                if(isTipping()){
-                    recover();
-                } else {
-                    setAngles(0,0);
+                stage++;
+            case STAGE_TWO: // Lift off into outerspace (Move straight up)
+                while(!this.ankleController.isSteadyState() || !this.kneeController.isSteadyState()){
+                    if(isTipping()){
+                        recover();
+                    } else {
+                        // this.ankleController.setGains(0.05, 0.0, 0.0);
+                        // this.kneeController.setGains(0.05, 0.0, 0.0);
+                        this.ankleController.setSetpoint(0);
+                        this.kneeController.setSetpoint(0);
+                    }
                 }
-                break;
-            case STAGE_THREE:
-                if(isTipping()){
-                    recover();
-                } else {
-                    setAngles(0,0);
+                stage++;
+            case STAGE_THREE: // Enter orbit (Move front wheels onto the platform) (Possibly not needed)
+                while(!this.ankleController.isSteadyState() || !this.kneeController.isSteadyState()){
+                    if(isTipping()){
+                        recover();
+                    } else {
+                        // this.ankleController.setGains(0.05, 0.0, 0.0);
+                        // this.kneeController.setGains(0.05, 0.0, 0.0);
+                        this.ankleController.setSetpoint(0);
+                        this.kneeController.setSetpoint(0);
+                    }
                 }
-                break;
-            case FINALIZE:
-                setAngles(0,0);
+                stage++;
+            case FINALIZE: // Retract landing gear (Rotate foot up) (Optional)
+                while(!this.ankleController.isSteadyState() || !this.kneeController.isSteadyState()){
+                    // this.ankleController.setGains(0.05, 0.0, 0.0);
+                    // this.kneeController.setGains(0.05, 0.0, 0.0);
+                    this.ankleController.setSetpoint(0);
+                    this.kneeController.setSetpoint(0);
+                }
+                haltSystem();
                 break;
         }
     }
 
     /**
-     * @return True if the acceleration due to gravity varies more than 1 meter per second in the x axis
+     * @return True if the acceleration due to gravity varies more than 1 meter per second in the y-axis
      */
     private boolean isTipping(){
-        double x = Math.abs(accelerometer.getX())-9.8;
-        return x >= 1.0 || x <= 1.0; 
+        double y = accelerometer.getY();
+        return y >= 1.0 || y <= 1.0; 
     }
 
     @Override
     protected void haltSystem(){
-        this.linkageOneSpeed = 0.0;
-        this.linkageTwoSpeed = 0.0;
+        this.ankle.disable();
+        this.knee.disable();
     }
 
     /**
@@ -99,24 +143,15 @@ class Climber extends Subsystem {
      * to be parallel to the floor again
      */
     private void recover(){
-        //TODO Get logic to recover from tilt
+        if(accelerometer.getY() > 1.0){
+            this.ankleController.setPercentOutput(ANKLE_MAX_OUTPUT + 0.1);
+        } else {
+            this.ankleController.setPercentOutput(ANKLE_MAX_OUTPUT - 0.1);
+        }
     }
 
-    /**
-     * Applies the power to linkages to get them to 
-     * the desired angle
-     * @param theta Theta is the desired angle closer to the bot (linkageOne)
-     * @param phi Phi is the desired angle closer to the foot (linkageTwo)
-     */
-    private void setAngles(int theta, int phi){
-        double currentTheta = encoderTheta.getDistance();
-        double currentPhi = encoderPhi.getDistance();
-        double speedTheta = theta - currentTheta;
-        double speedPhi = phi - currentPhi;
-
-        speedTheta /= RATE;
-        speedPhi /= RATE;
-        
+    public void requestClimb(boolean isRequested){
+        this.climbRequested = isRequested;
     }
 
 }

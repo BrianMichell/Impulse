@@ -10,33 +10,36 @@ public class Drive extends Subsystem {
     private final PowerDistributionPanel pdp;
 
     private double maxDraw = 0;
+    private boolean isTank = false;
+    private final double RATE = 250.0;
 
     public double forward;
     public double turn;
-    private int[] MOTORS;
+    // private int[] MOTORS;
 
-    private final int CURRENT_MAX = 120000;
+    private final int CURRENT_MAX = 100;
 
     public Drive(Hardware hw) {
         super(hw, "Drive");
         this.drive = hw.drive;
         this.pdp = hw.pdp;
-        this.MOTORS = hw.MOTORS;
+        // this.MOTORS = hw.MOTORS;
     }
 
     @Override
     protected void actions() {
-        double forward = DriverJoystick.getForward();
-        double turn = DriverJoystick.getTurn();
-        updateSpeeds(forward, turn);
-        this.drive.arcadeDrive(forward, turn);
-        SmartDashboard.putNumber("Forward speed", this.forward);
-        SmartDashboard.putNumber("Turn speed", this.turn);
+        if(!isTank){
+            this.drive.arcadeDrive(forward, turn, false);
+        }
+        SmartDashboard.putNumber("Forward speed", forward);
+        SmartDashboard.putNumber("Turn speed", turn);
     }
 
     @Override
     protected void haltSystem() {
         this.drive.stopMotor();
+        this.forward = 0.0;
+        this.turn = 0.0;
     }
 
     /**
@@ -45,14 +48,14 @@ public class Drive extends Subsystem {
      * @return The total number of amps drawn by the drivetrain
      */
     private double reportCurrentDraw() {
-        double ret = 0;
+        double currentCurrent = 0;
         /*
          * for(int i=0; i<MOTORS.length; i++){ ret += this.pdp.getCurrent(MOTORS[i]); }
          */
-        ret = this.pdp.getTotalCurrent();
-        SmartDashboard.putNumber("Drivetrain current draw", ret);
-        if (ret > maxDraw) {
-            maxDraw = ret;
+        currentCurrent = this.pdp.getTotalCurrent();
+        SmartDashboard.putNumber("Drivetrain current draw", currentCurrent);
+        if (currentCurrent > maxDraw) {
+            maxDraw = currentCurrent;
         }
 
         SmartDashboard.putNumber("Max current", maxDraw);
@@ -63,56 +66,50 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Right 2", this.pdp.getCurrent(0x00F - 0x00F / 0x00F)); //14
         SmartDashboard.putNumber("Right 3", this.pdp.getCurrent(0x00F)); //15
 
-        return ret;
+        return currentCurrent;
     }
 
     /**
      * Updates the desired power outputs
      * 
-     * @param forward The forward/backward power
-     * @param turn    The twist power
+     * @param _forward The forward/backward power
+     * @param _turn    The twist power
      */
-    public void updateSpeeds(double forward, double turn) {
+    public void updateSpeeds(double _forward, double _turn, boolean highGear) {
 
         double forwardChange, turnChange;
-        forwardChange = calculateIncrease(forward);
-        turnChange = calculateIncrease(turn);
-
-        // Flip the signs so the power creeps down
-        if (Math.abs(forwardChange) < Math.abs(this.forward)) {
-            if (forwardChange > this.forward) {
-                forwardChange *= -1.0;
-            }
-            if (forwardChange == 0) {
-                forwardChange = this.forward / 1.1125;
-            }
+        if(_turn >= 0){
+            _turn = Math.pow(_turn, (double)(1/1.4));
+        } else {
+            _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
         }
-
-        if (Math.abs(turnChange) < Math.abs(this.turn)) {
-            if (turnChange > this.turn) {
-                turnChange *= -1;
-            }
-            if (turnChange == 0) {
-                turnChange = this.turn / 1.1125;
-            }
-        }
-
+        forwardChange = calculateIncrease(_forward, forward, highGear);
+        turnChange = calculateIncrease(_turn, turn, highGear);
+        
         this.forward += forwardChange;
         this.turn += turnChange;
-        if (Math.abs(this.forward) > Math.abs(forward)) {
-            this.forward = forward;
+        if (Math.abs(this.forward) > Math.abs(_forward)) {
+            this.forward = _forward;
         }
-        if (Math.abs(this.turn) > Math.abs(turn)) {
-            this.turn = turn;
+        if (Math.abs(this.turn) > Math.abs(_turn)) {
+            this.turn = _turn;
         }
-
     }
 
-    private double calculateIncrease(double input) {
-        if (overCurrent()) {
-            return input >= 0 ? -0.01 : 0.01; // TODO Actually implement a rampdown for current limiting
+    private double calculateIncrease(double input, double currentOutput, boolean highGear) {
+        int divideFactor = 6;
+        double limitedBand = 0.3;
+        if(highGear) {
+            limitedBand += 0.15;
         }
-        return Math.pow(input, 3) / 4;
+        if(Math.abs(input) <= limitedBand && Math.abs(currentOutput) <= limitedBand) {
+            divideFactor = 11;
+        }
+        if (overCurrent() || underVoltage()) {
+            input *= -1.0;
+            divideFactor *= 5;
+        }
+        return Math.pow(input, 3) / (double) divideFactor;
     }
 
     /**
@@ -122,5 +119,36 @@ public class Drive extends Subsystem {
     public boolean overCurrent() {
         return reportCurrentDraw() > CURRENT_MAX;
     }
+
+    public boolean underVoltage() {
+        return this.pdp.getVoltage() < 8.5;
+    }
+
+    public void oneSideTurn(double leftPower, double rightPower){
+        if(leftPower > 0 ){
+            this.drive.arcadeDrive(0, -leftPower/2.0);
+            // this.drive.tankDrive(leftPower/1, -0.3);
+        } else {
+            this.drive.arcadeDrive(0, rightPower/2.0);
+            // this.drive.tankDrive(-0.3, rightPower/1.125);
+        }
+    }
+
+    public void setTank(boolean isTank){
+        this.isTank = isTank;
+    }
+
+    public void calculateTurn(double angleDesired, double currentAngle){
+        this.forward = 0.0;
+        currentAngle %= 360;
+        double desiredPower = (angleDesired - currentAngle) / RATE;
+        desiredPower = normalize(desiredPower, 0.99);
+        this.turn += calculateIncrease(desiredPower, this.turn, false);
+        this.drive.arcadeDrive(0, this.turn);
+    }
+
+    private double normalize(double value, double max) {
+		return Math.max(-max, Math.min(value, max));
+	}
 
 }
