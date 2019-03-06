@@ -47,10 +47,10 @@ public class Hardware {
 
         drive = new DifferentialDrive(left, right);
 
-        ankleOne = new VictorSP(1);
-        ankleTwo = new VictorSP(2);
-        kneeOne = new VictorSP(3);
-        kneeTwo = new VictorSP(4);
+        ankleOne = new VictorSP(0);
+        ankleTwo = new VictorSP(1);
+        kneeOne = new VictorSP(2);
+        kneeTwo = new VictorSP(3);
         ankle = new SpeedControllerGroup(ankleOne, ankleTwo);
         knee = new SpeedControllerGroup(kneeOne, kneeTwo);
 
