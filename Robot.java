@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
         shift = new Shifter(hw);
 
         shiftToggle = new Toggle();
-        hw.gyro.calibrateGX();
+        // hw.gyro.calibrateGX();
 
         // CameraServer.getInstance().startAutomaticCapture();
     }
@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
         hatch.setOpen(dLB);
 
         // level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
-        SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
+        // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);

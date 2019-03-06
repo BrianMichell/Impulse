@@ -29,7 +29,7 @@ public class Hardware {
     // Sensors
     public final BuiltInAccelerometer accelerometer;
     public final PowerDistributionPanel pdp;
-    public final MPU9250 gyro;
+    // public final MPU9250 gyro;
 
     protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
 
@@ -61,7 +61,7 @@ public class Hardware {
         // Sensors
         accelerometer = new BuiltInAccelerometer();
         pdp = new PowerDistributionPanel(0);
-        gyro = new MPU9250();
+        // gyro = new MPU9250();
 
     }
 
