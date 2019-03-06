@@ -50,7 +50,9 @@ class Climber extends Subsystem {
         SmartDashboard.putBoolean("Climb requested", this.climbRequested);
         SmartDashboard.putBoolean("Climb initiated", this.climbInitiated);
 
-        if(isEndgame() && this.climbRequested){
+        if(this.climbRequested) {
+        //TODO Make sure isEndgame() is correct and reimplement
+        // if(isEndgame() && this.climbRequested){
             if(!this.climbInitiated){
                 this.stage = STAGE_ONE;
                 climb();

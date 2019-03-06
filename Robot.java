@@ -101,6 +101,9 @@ public class Robot extends TimedRobot {
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
+
+        SmartDashboard.putNumber("Ankle encoder", hw.ankleEncoder.get());
+        SmartDashboard.putNumber("Knee encoder", hw.kneeEncoder.get());
     }
 
     @Override
