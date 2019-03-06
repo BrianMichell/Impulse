@@ -77,6 +77,9 @@ public class Robot extends TimedRobot {
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
 
+        boolean sA = secondary.getAButton();
+        boolean sB = secondary.getBButton();
+
         // double theta, phi;
         // theta = secondary.getRawAxis(1);
         // phi = secondary.getRawAxis(5);
@@ -91,7 +94,7 @@ public class Robot extends TimedRobot {
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
-        } else if(secondary.getAButton() && secondary.getBButton()) { //Hold both buttons to begin climb
+        } else if(sA && sB) { //Hold both buttons to begin climb
             drive.updateSpeeds(Math.abs(DriverJoystick.getForward()), Math.abs(DriverJoystick.getTurn()), false); //Limit driver control to forward only
             climber.requestClimb(true);
         } else {
@@ -110,6 +113,5 @@ public class Robot extends TimedRobot {
         drive.disable();
         hatch.disable();
         shift.disable();
-        // driveController.disable();
     }
 }
