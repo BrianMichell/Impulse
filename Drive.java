@@ -20,10 +20,10 @@ public class Drive extends Subsystem {
     private final int CURRENT_MAX = 100;
 
     public Drive(Hardware hw) {
-        super(hw, "Drive");
         this.drive = hw.drive;
         this.pdp = hw.pdp;
         // this.MOTORS = hw.MOTORS;
+        start("Drive");
     }
 
     @Override

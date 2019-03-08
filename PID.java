@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -61,11 +60,12 @@ class PID implements Runnable {
                 this.output = normalize(kP * error + kD * derivative);
                 
                 this.previousError = error;
-                this.lastTimeMeasurement = System.nanoTime();
             } else {
-                lastTimeMeasurement = System.nanoTime();
+                Timer.delay(0.001);
             }
-            SmartDashboard.putNumber("PID output", this.output);
+            
+            this.lastTimeMeasurement = System.nanoTime();
+            //SmartDashboard.putNumber("PID output", this.output);
         }
     }
 
@@ -77,11 +77,11 @@ class PID implements Runnable {
         this.maxOutput = percentOutput;
     }
 
-    public void enable() {
+    public void enabled() {
         this.state = true;
     }
 
-    public void disable() {
+    public void disabled() {
         this.state = false;
     }
 

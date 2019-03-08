@@ -10,9 +10,10 @@ public class Shifter extends Subsystem {
     private boolean highGear;
 
     public Shifter(Hardware hw){
-        super(hw, "Shifter");
         this.shifter = hw.shifter;
         this.highGear = false;
+
+        start("Shifter");
     }
 
     @Override
