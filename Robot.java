@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.DriverStation;
+// import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
@@ -91,6 +91,12 @@ public class Robot extends TimedRobot {
         // double knee = 0.0;
         // ankle = secondary.getRawAxis(1);
         // knee = secondary.getRawAxis(5);
+        // if(Math.abs(ankle) < 0.08) {
+        //     ankle = 0.0;
+        // }
+        // if(Math.abs(knee) < 0.08) {
+        //     knee = 0.0;
+        // }
         // climber.manualDrive(ankle, knee);
 
         shift.setInHighGear(shiftToggle.update(dRB));
@@ -100,12 +106,14 @@ public class Robot extends TimedRobot {
         // level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
+        climber.requestClimb(sA && sB);
+
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
         } else if(sA && sB) { //Hold both buttons to begin climb
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), false); //Limit driver control to forward only
-            climber.requestClimb(true);
+            // climber.requestClimb(true);
         } 
         else {
             drive.setTank(false);

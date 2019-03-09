@@ -59,6 +59,9 @@ public class Hardware {
         ankleEncoder = new Encoder(0, 1);
         kneeEncoder = new Encoder(2, 3);
 
+        ankleEncoder.reset();
+        kneeEncoder.reset();
+
         // Sensors
         accelerometer = new BuiltInAccelerometer();
         pdp = new PowerDistributionPanel(0);
