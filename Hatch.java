@@ -9,9 +9,10 @@ public class Hatch extends Subsystem {
     private boolean open;
     
     public Hatch(Hardware hw){
-        super(hw, "Hatch");
         this.hatchClamp = hw.hatchClamp;
         this.open = true;
+
+        start("Hatch");
     }
 
     @Override

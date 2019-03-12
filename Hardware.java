@@ -29,7 +29,7 @@ public class Hardware {
     // Sensors
     public final BuiltInAccelerometer accelerometer;
     public final PowerDistributionPanel pdp;
-    public final MPU9250 gyro;
+    // public final MPU9250 gyro;
 
     protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
 
@@ -47,10 +47,11 @@ public class Hardware {
 
         drive = new DifferentialDrive(left, right);
 
-        ankleOne = new VictorSP(1);
-        ankleTwo = new VictorSP(2);
-        kneeOne = new VictorSP(3);
-        kneeTwo = new VictorSP(4);
+        ankleOne = new VictorSP(2); // Victor 9
+        ankleTwo = new VictorSP(3); // Victor 7 (N/A)
+        kneeOne = new VictorSP(0); //Victor 10
+        kneeTwo = new VictorSP(1); //Victor 8
+        kneeTwo.setInverted(true);
         ankle = new SpeedControllerGroup(ankleOne, ankleTwo);
         knee = new SpeedControllerGroup(kneeOne, kneeTwo);
 
@@ -58,10 +59,20 @@ public class Hardware {
         ankleEncoder = new Encoder(0, 1);
         kneeEncoder = new Encoder(2, 3);
 
+        ankleEncoder.reset();
+        kneeEncoder.reset();
+
         // Sensors
         accelerometer = new BuiltInAccelerometer();
         pdp = new PowerDistributionPanel(0);
-        gyro = new MPU9250();
+        // gyro = new MPU9250();
+
+        /**
+         * Victor 9 = PWM 2
+         * Victor 10 = PWM 0
+         * Victor 7 = DEAD (Would have been 3)
+         * Victor 8 = 1
+         */
 
     }
 

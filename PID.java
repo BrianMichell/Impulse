@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -12,7 +11,7 @@ class PID implements Runnable {
 
     private long lastTimeMeasurement;
     private double previousError;
-    // private double integral;
+    private double integral;
 
     public double output;
     private boolean state;
@@ -38,7 +37,7 @@ class PID implements Runnable {
         this.kD = kD;
         this.encoder = encoder;
         this.previousError = 0.0;
-        // this.integral = 0.0;
+        this.integral = 0.0;
         this.lastTimeMeasurement = System.nanoTime();
         this.setpoint = 0.0;
         this.output = 0.0;
@@ -50,22 +49,23 @@ class PID implements Runnable {
 
     public void run(){
         while(!Thread.interrupted()) {
+            long now = System.nanoTime();
             if(this.state){
-                long now = System.nanoTime();
                 double dt = (now - this.lastTimeMeasurement) / (double) 1000000000; //Change of time (in seconds)
                 double error = this.setpoint - this.encoder.get();
-                // this.integral += error * dt; //Add to the rieman sum
+                this.integral += error * dt; //Add to the rieman sum
                 double derivative = (error - this.previousError) / dt;
                 
-                // this.output = normalize(kP * error + kI * this.integral + kD * derivative);
-                this.output = normalize(kP * error + kD * derivative);
+                this.output = normalize(kP * error + kI * this.integral + kD * derivative);
+                // this.output = normalize(kP * error + kD * derivative);
                 
                 this.previousError = error;
-                this.lastTimeMeasurement = System.nanoTime();
             } else {
-                lastTimeMeasurement = System.nanoTime();
+                Timer.delay(0.001);
             }
-            SmartDashboard.putNumber("PID output", this.output);
+            
+            this.lastTimeMeasurement = now;
+            //SmartDashboard.putNumber("PID output", this.output);
         }
     }
 
@@ -77,11 +77,11 @@ class PID implements Runnable {
         this.maxOutput = percentOutput;
     }
 
-    public void enable() {
+    public void enabled() {
         this.state = true;
     }
 
-    public void disable() {
+    public void disabled() {
         this.state = false;
     }
 
@@ -95,7 +95,7 @@ class PID implements Runnable {
      */
     public boolean isSteadyState(){
         double percentError = (Math.abs(this.encoder.get() - this.setpoint) / this.setpoint) * 100.0;
-        return (percentError <= 5 && Math.abs(this.output) < 0.1);
+        return (percentError <= 10 && Math.abs(this.output) < 0.15);
     }
 
     public void setGains(double kP, double kI, double kD){
