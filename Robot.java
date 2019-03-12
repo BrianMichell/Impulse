@@ -46,7 +46,6 @@ public class Robot extends TimedRobot {
         shiftToggle = new Toggle();
         // hw.gyro.calibrateGX();
 
-        // CameraServer.getInstance().startAutomaticCapture();
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
         cam.setResolution(40, 40);
       }
@@ -91,23 +90,14 @@ public class Robot extends TimedRobot {
         boolean sA = secondary.getAButton();
         boolean sB = secondary.getBButton();
 
-        // double ankle = 0.0;
-        // double knee = 0.0;
-        // ankle = secondary.getRawAxis(1);
-        // knee = secondary.getRawAxis(5);
-        // if(Math.abs(ankle) < 0.08) {
-        //     ankle = 0.0;
-        // }
-        // if(Math.abs(knee) < 0.08) {
-        //     knee = 0.0;
-        // }
+        // double ankle = secondary.getRawAxis(1);
+        // double knee = secondary.getRawAxis(5);
         // climber.manualDrive(ankle, knee);
 
         shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
 
         level2.actuate(driver.joystick.getYButton() || driver.joystick.getXButton() || driver.joystick.getBButton());
-        // level2.actuate(secondary.getBumper(GenericHID.Hand.kLeft));
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
         climber.requestClimb(sA && sB);
@@ -123,10 +113,6 @@ public class Robot extends TimedRobot {
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
-
-        // if(DriverStation.getInstance().getMatchTime() <= 30){
-        //     hw.compressor.stop();
-        // }
 
     }
 

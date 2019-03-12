@@ -127,10 +127,8 @@ public class Drive extends Subsystem {
     public void oneSideTurn(double leftPower, double rightPower){
         if(leftPower > 0 ){
             this.drive.arcadeDrive(0, -leftPower/2.0);
-            // this.drive.tankDrive(leftPower/1, -0.3);
         } else {
             this.drive.arcadeDrive(0, rightPower/2.0);
-            // this.drive.tankDrive(-0.3, rightPower/1.125);
         }
     }
 

@@ -24,10 +24,6 @@ class Climber extends Subsystem {
 
     private final double angle = 28.5 * Math.PI / 180;
 
-    private final double ANKLE_MAX_OUTPUT = 0.72;
-
-    // private PID ankleController, kneeController;
-
     private boolean climbRequested;
     private boolean climbInitiated;
 
@@ -46,12 +42,8 @@ class Climber extends Subsystem {
         this.stage = this.DISABLED;
         this.ankle = hw.ankle;
         this.knee = hw.knee;
-        // this.ankleController = new PID(-0.065, -0.125, -0.65, this.ankleEncoder,
-        // 0.72);
-        // this.kneeController = new PID(-0.065, -0.125, -0.65, this.kneeEncoder);
         this.climbRequested = false;
         this.climbInitiated = false;
-        // this.ds = DriverStation.getInstance();
         start("Climber");
     }
 
@@ -66,8 +58,6 @@ class Climber extends Subsystem {
             if (!this.climbInitiated) {
                 this.stage = STAGE_ONE;
                 this.climbInitiated = true;
-                // ankleController.enabled();
-                // kneeController.enabled();
             }
 
             climb();
@@ -81,24 +71,6 @@ class Climber extends Subsystem {
         knee.set(kneeSpeed);
     }
 
-    // private void stageCommon() {
-    // if (!this.ankleController.isSteadyState() ||
-    // !this.kneeController.isSteadyState()) {
-    // if (isTipping()) {
-    // recover();
-    // } else if (!this.climbRequested) {
-    // stage = DISABLED;
-    // return;
-    // }
-    // this.ankle.set(this.ankleController.output);
-    // this.knee.set(this.kneeController.output);
-    // SmartDashboard.putNumber("Ankle output", this.ankleController.output);
-    // SmartDashboard.putNumber("Knee output", this.kneeController.output);
-    // } else {
-    // stage = STAGE_TWO;
-    // }
-    // }
-
     private double normalize(double val, double minPow, double maxPow) {
         if (val < 0)
             return Math.max(-maxPow, Math.min(val, -minPow));
@@ -111,11 +83,6 @@ class Climber extends Subsystem {
 
         switch (stage) {
         case STAGE_ONE: // Tip back for liftoff (Shift CG over the foot)
-            // this.ankleController.setGains(0.05, 0.0, 0.0);
-            // this.kneeController.setGains(0.05, 0.0, 0.0);
-            // this.ankleController.setSetpoint(0);
-            // this.kneeController.setSetpoint(-205);
-            // stageCommon();
             double dAngle = -angle - Math.asin(accelerometer.getY());
             double angleLog = dAngle / 2;
 
@@ -142,41 +109,11 @@ class Climber extends Subsystem {
             SmartDashboard.putNumber("Ankle Power", anklePower);
 
             break;
-        case STAGE_TWO: // Lift off into outerspace (Move straight up)
-            // this.ankleController.setGains(0.05, 0.0, 0.0);
-            // this.kneeController.setGains(0.05, 0.0, 0.0);
-            // this.ankleController.setSetpoint(0);
-            // this.kneeController.setSetpoint(-890);
-            // stageCommon();
+        case STAGE_TWO: 
             break;
-        case STAGE_THREE: // Enter orbit (Move front wheels onto the platform) (Possibly not needed)
-            // this.ankleController.setGains(0.05, 0.0, 0.0);
-            // this.kneeController.setGains(0.05, 0.0, 0.0);
-            // this.ankleController.setSetpoint(-100);
-            // this.kneeController.setSetpoint(-935);
-            // this.ankleController.setSetpoint(0);
-            // this.kneeController.setSetpoint(-1287);
-            // stageCommon();
+        case STAGE_THREE:
             break;
-        case FINALIZE: // Retract landing gear (Rotate foot up) (Optional)
-            // this.ankleController.setGains(0.05, 0.0, 0.0);
-            // this.kneeController.setGains(0.05, 0.0, 0.0);
-            // this.ankleController.setSetpoint(0);
-            // this.kneeController.setSetpoint(0);
-            // if (!this.ankleController.isSteadyState() ||
-            // !this.kneeController.isSteadyState()) {
-            // this.ankle.set(this.ankleController.output);
-            // this.knee.set(this.kneeController.output);
-            // SmartDashboard.putNumber("Ankle output", this.ankleController.output);
-            // SmartDashboard.putNumber("Knee output", this.kneeController.output);
-            // if (!this.climbRequested) {
-            // stage = DISABLED;
-            // break;
-            // }
-            // } else {
-            // stage = DISABLED;
-            // }
-            // break;
+        case FINALIZE:
             break;
         case DISABLED:
         default:
@@ -198,19 +135,7 @@ class Climber extends Subsystem {
     protected void haltSystem() {
         this.ankle.stopMotor();
         this.knee.stopMotor();
-        // ankleController.disabled();
-        // kneeController.disabled();
     }
-
-    // @Override
-    // public void enable(){
-    // //nothing
-    // }
-
-    // @Override
-    // public void disable(){
-    // haltSystem();
-    // }
 
     /**
      * @return Has at least 130 seconds passed
@@ -225,11 +150,6 @@ class Climber extends Subsystem {
      * again
      */
     private void recover() {
-        // if (accelerometer.getY() > 1.0) {
-        // this.ankleController.setPercentOutput(ANKLE_MAX_OUTPUT + 0.1);
-        // } else {
-        // this.ankleController.setPercentOutput(ANKLE_MAX_OUTPUT - 0.1);
-        // }
     }
 
     public void requestClimb(boolean isRequested) {

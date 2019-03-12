@@ -24,11 +24,7 @@ public class Hardware {
     public final DoubleSolenoid climberPistons = new DoubleSolenoid(5, 7);
 
     // Encoders
-<<<<<<< HEAD
-    public final Encoder encoderTheta, encoderPhi, driveEncoderLeft, driveEncoderRight;
-=======
     public final Encoder ankleEncoder, kneeEncoder;
->>>>>>> b51531e93015ca32f874750c1a6a550b9278098f
     
     // Sensors
     public final BuiltInAccelerometer accelerometer;
@@ -60,18 +56,11 @@ public class Hardware {
         knee = new SpeedControllerGroup(kneeOne, kneeTwo);
 
         // Encoders
-<<<<<<< HEAD
-        encoderTheta = new Encoder(0, 1);
-        encoderPhi = new Encoder(2, 3);
-        driveEncoderLeft = new Encoder(4, 5);
-        driveEncoderRight = new Encoder(6, 7);
-=======
         ankleEncoder = new Encoder(0, 1);
         kneeEncoder = new Encoder(2, 3);
 
         ankleEncoder.reset();
         kneeEncoder.reset();
->>>>>>> b51531e93015ca32f874750c1a6a550b9278098f
 
         // Sensors
         accelerometer = new BuiltInAccelerometer();
