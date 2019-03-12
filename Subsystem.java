@@ -11,17 +11,7 @@ abstract class Subsystem implements Runnable {
     /**
      * Generic constructor for Subsystem class.
      */
-    public Subsystem(Hardware hw) {
-        this(hw, "Subsystem");
-    }
-
-    /**
-     * Creates a subsystem with a name in the thread.
-     * @param name The name of the subsystem in question.
-     */
-    public Subsystem(Hardware hw, String name){
-        state = DISABLED;
-        new Thread(this, name).start();
+    public Subsystem() {
     }
 
     /**
@@ -41,8 +31,17 @@ abstract class Subsystem implements Runnable {
                     haltSystem();
                     break;
             }
-            Timer.delay(0.005);
+            Timer.delay(0.001);
         }
+    }
+
+    protected void start(){
+        start("Subsystem");
+    }
+
+    protected void start(String name){
+        state = DISABLED;
+        new Thread(this, name).start();
     }
 
     /**

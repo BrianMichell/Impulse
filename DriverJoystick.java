@@ -6,10 +6,15 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class DriverJoystick implements Runnable {
 
-    // private final int LEFT_X = 0;
-    // private final int RIGHT_Y = 5;
     private final int LEFT_Y = 1;
     private final int RIGHT_X = 4;
+
+    public static class POV{
+        public static final int UP = 0;
+        public static final int DOWN = 180;
+        public static final int LEFT = 90;
+        public static final int RIGHT = 270;
+    }
 
     public static double appliedPower[] = { 0, 0 };
 
