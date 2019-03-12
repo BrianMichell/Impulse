@@ -8,11 +8,12 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.VictorSP;
+import com.ctre.phoenix.motorcontrol.can.*;
 
 public class Hardware {
 
     // Motors
-    private final VictorSPX2 leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
+    private final WPI_VictorSPX leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
     public final DifferentialDrive drive;
     private final VictorSP ankleOne, ankleTwo, kneeOne, kneeTwo;
     public final SpeedControllerGroup ankle, knee;
@@ -35,12 +36,12 @@ public class Hardware {
 
     public Hardware() {
         // Motors
-        leftDrive1 = new VictorSPX2(1);
-        leftDrive2 = new VictorSPX2(2);
-        leftDrive3 = new VictorSPX2(3);
-        rightDrive1 = new VictorSPX2(4);
-        rightDrive2 = new VictorSPX2(5);
-        rightDrive3 = new VictorSPX2(6);
+        leftDrive1 = new WPI_VictorSPX(1);
+        leftDrive2 = new WPI_VictorSPX(2);
+        leftDrive3 = new WPI_VictorSPX(3);
+        rightDrive1 = new WPI_VictorSPX(4);
+        rightDrive2 = new WPI_VictorSPX(5);
+        rightDrive3 = new WPI_VictorSPX(6);
 
         SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2, leftDrive3);
         SpeedControllerGroup right = new SpeedControllerGroup(rightDrive1, rightDrive2, rightDrive3);
