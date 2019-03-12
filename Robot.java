@@ -56,6 +56,10 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Ankle encoder", hw.ankleEncoder.get());
         SmartDashboard.putNumber("Knee encoder", hw.kneeEncoder.get());
         SmartDashboard.putNumber("Stage", climber.stage);
+        SmartDashboard.putNumber("Accel Z", hw.accelerometer.getZ());
+        SmartDashboard.putNumber("Accel Y", hw.accelerometer.getY());
+        SmartDashboard.putNumber("Accel X", hw.accelerometer.getX());
+        SmartDashboard.putNumber("Tilt Angle", Math.asin(hw.accelerometer.getY()) * 180 / Math.PI);
     }
 
     @Override
