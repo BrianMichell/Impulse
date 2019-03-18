@@ -52,13 +52,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putNumber("Knee encoder", hw.kneeEncoder.get());
-        SmartDashboard.putNumber("Hip encoder", hw.hipEncoder.get());
-        SmartDashboard.putNumber("Stage", climber.stage);
-        SmartDashboard.putNumber("Accel Z", hw.accelerometer.getZ());
-        SmartDashboard.putNumber("Accel Y", hw.accelerometer.getY());
-        SmartDashboard.putNumber("Accel X", hw.accelerometer.getX());
-        SmartDashboard.putNumber("Tilt Angle", Math.asin(hw.accelerometer.getY()) * 180 / Math.PI);
     }
 
     @Override
@@ -73,7 +66,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit(){
-        climber.enable();
         drive.enable();
         hatch.enable();
         shift.enable();
@@ -90,9 +82,8 @@ public class Robot extends TimedRobot {
         boolean sA = secondary.getAButton();
         boolean sB = secondary.getBButton();
 
-        // double knee = secondary.getRawAxis(1);
-        // double hip = secondary.getRawAxis(5);
-        // climber.manualDrive(knee, hip);
+        // double hip = secondary.getRawAxis(1);
+        // climber.manualDrive(hip);
 
         shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
@@ -100,19 +91,20 @@ public class Robot extends TimedRobot {
         level2.actuate(driver.joystick.getYButton() || driver.joystick.getXButton() || driver.joystick.getBButton());
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
-        climber.requestClimb(sA && sB);
+        double climberSpeed = 0.0;
 
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
         } else if(sA && sB) { //Hold both buttons to begin climb
+            climberSpeed = 1.0;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), false); //Limit driver control to forward only
-            // climber.requestClimb(true);
-        } 
-        else {
+        } else {
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
         }
+
+        climber.manualDrive(climberSpeed);
 
     }
 
@@ -122,7 +114,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic(){
-        climber.disable();
         drive.disable();
         hatch.disable();
         shift.disable();

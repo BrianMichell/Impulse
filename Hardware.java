@@ -15,8 +15,8 @@ public class Hardware {
     // Motors
     private final WPI_VictorSPX leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
     public final DifferentialDrive drive;
-    private final VictorSP kneeOne, kneeTwo, hipOne, hipTwo;
-    public final SpeedControllerGroup knee, hip;
+    private final VictorSP hipOne, hipTwo;
+    public final SpeedControllerGroup hip;
 
     // Pneumatics
     public final Compressor compressor = new Compressor();
@@ -24,11 +24,7 @@ public class Hardware {
     public final DoubleSolenoid hatchClamp = new DoubleSolenoid(4, 6);
     public final DoubleSolenoid climberPistons = new DoubleSolenoid(5, 7);
 
-    // Encoders
-    public final Encoder kneeEncoder, hipEncoder;
-    
     // Sensors
-    public final BuiltInAccelerometer accelerometer;
     public final PowerDistributionPanel pdp;
     // public final MPU9250 gyro;
 
@@ -48,23 +44,12 @@ public class Hardware {
 
         drive = new DifferentialDrive(left, right);
 
-        kneeOne = new VictorSP(2); // Victor 9
-        kneeTwo = new VictorSP(3); // Victor 7 (N/A)
         hipOne = new VictorSP(0); //Victor 10
         hipTwo = new VictorSP(1); //Victor 8
         hipTwo.setInverted(true);
-        knee = new SpeedControllerGroup(kneeOne, kneeTwo);
         hip = new SpeedControllerGroup(hipOne, hipTwo);
 
-        // Encoders
-        kneeEncoder = new Encoder(0, 1);
-        hipEncoder = new Encoder(2, 3);
-
-        kneeEncoder.reset();
-        hipEncoder.reset();
-
         // Sensors
-        accelerometer = new BuiltInAccelerometer();
         pdp = new PowerDistributionPanel(0);
         // gyro = new MPU9250();
 
