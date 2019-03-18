@@ -112,7 +112,7 @@ class Climber extends Subsystem {
             SmartDashboard.putNumber("KNee Power", kneePower);
 
             break;
-        case FINALIZE:
+        case FINALIZE: // Bring entire assembly back up
             break;
         case DISABLED:
         default:
