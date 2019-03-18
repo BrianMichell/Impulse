@@ -10,17 +10,20 @@ class Climber extends Subsystem {
 
     // DriverStation ds;
     BuiltInAccelerometer accelerometer;
-    Encoder ankleEncoder;
     Encoder kneeEncoder;
+    Encoder hipEncoder;
 
-    SpeedControllerGroup ankle, knee;
+    SpeedControllerGroup knee, hip;
 
     public int stage;
     private final int DISABLED = 0;
     private final int STAGE_ONE = 1;
-    private final int STAGE_TWO = 2;
-    private final int STAGE_THREE = 3;
-    private final int FINALIZE = 4;
+    private final int FINALIZE = 2;
+
+    private final double HIP_MAX = 0.85;
+    private final double HIM_MIN = 0.35;
+    private final double KNEE_MAX = 1.00;
+    private final double KNEE_MIN = 0.25;
 
     private final double angle = 28.5 * Math.PI / 180;
 
@@ -28,20 +31,20 @@ class Climber extends Subsystem {
     private boolean climbInitiated;
 
     public Climber(Hardware hw) {
-        // SmartDashboard.putNumber("Knee Log Denom", -50);
-        // SmartDashboard.putNumber("Knee Min", 0.35);
-        // SmartDashboard.putNumber("Knee Goal", -1200);
+        // SmartDashboard.putNumber("Hip Log Denom", -50);
+        // SmartDashboard.putNumber("Hip Min", 0.35);
+        // SmartDashboard.putNumber("Hip Goal", -1200);
 
-        // SmartDashboard.putNumber("Ankle Log Denom", -50);
-        // SmartDashboard.putNumber("Ankle Min", 0.3);
-        // SmartDashboard.putNumber("Ankle Goal", 0);
+        // SmartDashboard.putNumber("Knee Log Denom", -50);
+        // SmartDashboard.putNumber("Knee Min", 0.3);
+        // SmartDashboard.putNumber("Knee Goal", 0);
 
         this.accelerometer = hw.accelerometer;
-        this.ankleEncoder = hw.ankleEncoder;
         this.kneeEncoder = hw.kneeEncoder;
+        this.hipEncoder = hw.hipEncoder;
         this.stage = this.DISABLED;
-        this.ankle = hw.ankle;
         this.knee = hw.knee;
+        this.hip = hw.hip;
         this.climbRequested = false;
         this.climbInitiated = false;
         start("Climber");
@@ -66,9 +69,9 @@ class Climber extends Subsystem {
         }
     }
 
-    public void manualDrive(double ankleSpeed, double kneeSpeed) {
-        ankle.set(ankleSpeed);
+    public void manualDrive(double kneeSpeed, double hipSpeed) {
         knee.set(kneeSpeed);
+        hip.set(hipSpeed);
     }
 
     private double normalize(double val, double minPow, double maxPow) {
@@ -86,32 +89,28 @@ class Climber extends Subsystem {
             double dAngle = -angle - Math.asin(accelerometer.getY());
             double angleLog = dAngle / 2;
 
-            int dk = -1200 - kneeEncoder.get();
+            int dk = -1200 - hipEncoder.get();
 
             double log = (double) dk / -50;
             double min = 0.35;
 
-            double kneePower = normalize(log - angleLog, min, 0.85);
-            knee.set(kneePower);
+            double hipPower = normalize(log - angleLog, min, 0.85);
+            hip.set(hipPower);
 
-            SmartDashboard.putNumber("Knee Diff", dk);
-            SmartDashboard.putNumber("Knee Power", kneePower);
+            SmartDashboard.putNumber("Hip Diff", dk);
+            SmartDashboard.putNumber("Hip Power", hipPower);
 
-            int da = -ankleEncoder.get();
+            int da = -kneeEncoder.get();
 
             log = (double) da / -55;
             min = 0.25;
 
-            double anklePower = normalize(log, min, 0.85);
-            ankle.set(anklePower);
+            double kneePower = normalize(log, min, 0.85);
+            knee.set(kneePower);
 
-            SmartDashboard.putNumber("Ankle Diff", da);
-            SmartDashboard.putNumber("Ankle Power", anklePower);
+            SmartDashboard.putNumber("Knee Diff", da);
+            SmartDashboard.putNumber("KNee Power", kneePower);
 
-            break;
-        case STAGE_TWO: 
-            break;
-        case STAGE_THREE:
             break;
         case FINALIZE:
             break;
@@ -133,8 +132,8 @@ class Climber extends Subsystem {
 
     @Override
     protected void haltSystem() {
-        this.ankle.stopMotor();
         this.knee.stopMotor();
+        this.hip.stopMotor();
     }
 
     /**

@@ -52,8 +52,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putNumber("Ankle encoder", hw.ankleEncoder.get());
         SmartDashboard.putNumber("Knee encoder", hw.kneeEncoder.get());
+        SmartDashboard.putNumber("Hip encoder", hw.hipEncoder.get());
         SmartDashboard.putNumber("Stage", climber.stage);
         SmartDashboard.putNumber("Accel Z", hw.accelerometer.getZ());
         SmartDashboard.putNumber("Accel Y", hw.accelerometer.getY());
@@ -90,9 +90,9 @@ public class Robot extends TimedRobot {
         boolean sA = secondary.getAButton();
         boolean sB = secondary.getBButton();
 
-        // double ankle = secondary.getRawAxis(1);
-        // double knee = secondary.getRawAxis(5);
-        // climber.manualDrive(ankle, knee);
+        // double knee = secondary.getRawAxis(1);
+        // double hip = secondary.getRawAxis(5);
+        // climber.manualDrive(knee, hip);
 
         shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
