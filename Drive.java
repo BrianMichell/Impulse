@@ -82,10 +82,15 @@ public class Drive extends Subsystem {
     public void updateSpeeds(double _forward, double _turn, boolean highGear) {
 
         double forwardChange, turnChange;
-        if(_turn >= 0){
+        if(_turn > 0.0) {
             _turn = Math.pow(_turn, (double)(1/1.4));
-        } else {
+        } else if(_turn < 0.0) {
             _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
+        } else {
+            double rateDiff = leftDriveEncoder.getRate() + rightDriveEncoder.getRate();
+            if(Math.abs(rateDiff) > 10) {
+                _turn =  rateDiff / 25.0;
+            } 
         }
         forwardChange = calculateIncrease(_forward, forward, highGear);
         turnChange = calculateIncrease(_turn, turn, highGear);
