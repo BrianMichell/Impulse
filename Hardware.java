@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
@@ -26,6 +25,8 @@ public class Hardware {
 
     // Sensors
     public final PowerDistributionPanel pdp;
+    public final Encoder leftDriveEncoder;
+    public final Encoder rightDriveEncoder;
     // public final MPU9250 gyro;
 
     protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
@@ -51,6 +52,8 @@ public class Hardware {
 
         // Sensors
         pdp = new PowerDistributionPanel(0);
+        leftDriveEncoder = new Encoder(0, 1);
+        rightDriveEncoder = new Encoder(2, 3);
         // gyro = new MPU9250();
 
         /**

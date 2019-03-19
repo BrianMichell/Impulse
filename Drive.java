@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,10 +9,11 @@ public class Drive extends Subsystem {
 
     private final DifferentialDrive drive;
     private final PowerDistributionPanel pdp;
+    private final Encoder leftDriveEncoder;
+    private final Encoder rightDriveEncoder;
 
     private double maxDraw = 0;
     private boolean isTank = false;
-    private final double RATE = 250.0;
 
     public double forward;
     public double turn;
@@ -22,6 +24,8 @@ public class Drive extends Subsystem {
     public Drive(Hardware hw) {
         this.drive = hw.drive;
         this.pdp = hw.pdp;
+        this.leftDriveEncoder = hw.leftDriveEncoder;
+        this.rightDriveEncoder = hw.rightDriveEncoder;
         // this.MOTORS = hw.MOTORS;
         start("Drive");
     }
@@ -135,18 +139,5 @@ public class Drive extends Subsystem {
     public void setTank(boolean isTank){
         this.isTank = isTank;
     }
-
-    public void calculateTurn(double angleDesired, double currentAngle){
-        this.forward = 0.0;
-        currentAngle %= 360;
-        double desiredPower = (angleDesired - currentAngle) / RATE;
-        desiredPower = normalize(desiredPower, 0.99);
-        this.turn += calculateIncrease(desiredPower, this.turn, false);
-        this.drive.arcadeDrive(0, this.turn);
-    }
-
-    private double normalize(double value, double max) {
-		return Math.max(-max, Math.min(value, max));
-	}
 
 }
