@@ -26,9 +26,6 @@ public class Robot extends TimedRobot {
     Level2 level2;
     Drive drive;
     Hatch hatch;
-    Shifter shift;
-
-    Toggle shiftToggle;
 
     @Override
     public void robotInit() {
@@ -41,9 +38,7 @@ public class Robot extends TimedRobot {
         level2 = new Level2(hw);
         drive = new Drive(hw);
         hatch = new Hatch(hw);
-        shift = new Shifter(hw);
 
-        shiftToggle = new Toggle();
         // hw.gyro.calibrateGX();
 
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
@@ -68,7 +63,6 @@ public class Robot extends TimedRobot {
     public void teleopInit(){
         drive.enable();
         hatch.enable();
-        shift.enable();
     }
 
     @Override
@@ -84,11 +78,8 @@ public class Robot extends TimedRobot {
 
         // double hip = secondary.getRawAxis(1);
         // climber.manualDrive(hip);
-
-        shift.setInHighGear(shiftToggle.update(dRB));
         hatch.setOpen(dLB);
 
-        level2.actuate(driver.joystick.getYButton() || driver.joystick.getXButton() || driver.joystick.getBButton());
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
         double climberSpeed = 0.0;
@@ -98,10 +89,10 @@ public class Robot extends TimedRobot {
             drive.oneSideTurn(dLT, dRT);
         } else if(sA && sB) { //Hold both buttons to begin climb
             climberSpeed = 1.0;
-            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), false); //Limit driver control to forward only
+            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn())); //Limit driver control to forward only
         } else {
             drive.setTank(false);
-            drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn(), shift.isHighGear());
+            drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn());
         }
 
         climber.manualDrive(climberSpeed);
@@ -116,6 +107,5 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic(){
         drive.disable();
         hatch.disable();
-        shift.disable();
     }
 }

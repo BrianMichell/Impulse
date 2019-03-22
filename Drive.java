@@ -79,7 +79,7 @@ public class Drive extends Subsystem {
      * @param _forward The forward/backward power
      * @param _turn    The twist power
      */
-    public void updateSpeeds(double _forward, double _turn, boolean highGear) {
+    public void updateSpeeds(double _forward, double _turn) {
 
         double forwardChange, turnChange;
         if(_turn > 0.0) {
@@ -92,8 +92,8 @@ public class Drive extends Subsystem {
                 _turn =  rateDiff / 25.0;
             } 
         }
-        forwardChange = calculateIncrease(_forward, forward, highGear);
-        turnChange = calculateIncrease(_turn, turn, highGear);
+        forwardChange = calculateIncrease(_forward, forward);
+        turnChange = calculateIncrease(_turn, turn);
         
         this.forward += forwardChange;
         this.turn += turnChange;
@@ -105,12 +105,9 @@ public class Drive extends Subsystem {
         }
     }
 
-    private double calculateIncrease(double input, double currentOutput, boolean highGear) {
+    private double calculateIncrease(double input, double currentOutput) {
         int divideFactor = 6;
         double limitedBand = 0.3;
-        if(highGear) {
-            limitedBand += 0.15;
-        }
         if(Math.abs(input) <= limitedBand && Math.abs(currentOutput) <= limitedBand) {
             divideFactor = 11;
         }
