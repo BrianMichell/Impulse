@@ -9,7 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 // import edu.wpi.first.wpilibj.DriverStation;
@@ -23,7 +23,6 @@ public class Robot extends TimedRobot {
     Hardware hw;
     
     Climber climber;
-    Level2 level2;
     Drive drive;
     Hatch hatch;
 
@@ -35,7 +34,6 @@ public class Robot extends TimedRobot {
         hw = new Hardware();
         
         climber = new Climber(hw);
-        level2 = new Level2(hw);
         drive = new Drive(hw);
         hatch = new Hatch(hw);
 
@@ -68,7 +66,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         //Collect all joystick inputs
-        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
         boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
