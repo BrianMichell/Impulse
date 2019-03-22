@@ -73,8 +73,13 @@ public class Robot extends TimedRobot {
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
 
+        //Full speed climb
         boolean sA = secondary.getAButton();
         boolean sB = secondary.getBButton();
+        //Half speed climb
+        boolean sY = secondary.getYButton();
+        boolean sX = secondary.getXButton();
+
 
         // double hip = secondary.getRawAxis(1);
         // climber.manualDrive(hip);
@@ -90,6 +95,9 @@ public class Robot extends TimedRobot {
         } else if(sA && sB) { //Hold both buttons to begin climb
             climberSpeed = 1.0;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn())); //Limit driver control to forward only
+        } else if(sX && sY) {
+            climberSpeed = 0.5;
+            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()));
         } else {
             drive.setTank(false);
             drive.updateSpeeds(DriverJoystick.getForward(), DriverJoystick.getTurn());
