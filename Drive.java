@@ -86,7 +86,7 @@ public class Drive extends Subsystem {
             _turn = Math.pow(_turn, (double)(1/1.4));
         } else if(_turn < 0.0) {
             _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
-        } else {
+        } else { //TODO Test and tune
             double rateDiff = leftDriveEncoder.getRate() + rightDriveEncoder.getRate();
             if(Math.abs(rateDiff) > 10) {
                 _turn =  rateDiff / 25.0;
@@ -105,6 +105,7 @@ public class Drive extends Subsystem {
         }
     }
 
+    //TODO Retest and retune
     private double calculateIncrease(double input, double currentOutput) {
         int divideFactor = 6;
         double limitedBand = 0.3;
