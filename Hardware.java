@@ -19,9 +19,7 @@ public class Hardware {
 
     // Pneumatics
     public final Compressor compressor = new Compressor();
-    public final DoubleSolenoid shifter = new DoubleSolenoid(0, 1);
-    public final DoubleSolenoid hatchClamp = new DoubleSolenoid(4, 6);
-    public final DoubleSolenoid climberPistons = new DoubleSolenoid(5, 7);
+    public final DoubleSolenoid hatchClamp = new DoubleSolenoid(3, 4);
 
     // Sensors
     public final PowerDistributionPanel pdp;
@@ -33,11 +31,17 @@ public class Hardware {
 
     public Hardware() {
         // Motors
+        // leftDrive1 = new WPI_VictorSPX(1);
+        // leftDrive2 = new WPI_VictorSPX(2);
+        // leftDrive3 = new WPI_VictorSPX(3);
+        // rightDrive1 = new WPI_VictorSPX(4);
+        // rightDrive2 = new WPI_VictorSPX(5);
+        // rightDrive3 = new WPI_VictorSPX(6);
         leftDrive1 = new WPI_VictorSPX(1);
-        leftDrive2 = new WPI_VictorSPX(2);
-        leftDrive3 = new WPI_VictorSPX(3);
-        rightDrive1 = new WPI_VictorSPX(4);
-        rightDrive2 = new WPI_VictorSPX(5);
+        leftDrive2 = new WPI_VictorSPX(5);
+        leftDrive3 = new WPI_VictorSPX(4);
+        rightDrive1 = new WPI_VictorSPX(3);
+        rightDrive2 = new WPI_VictorSPX(2);
         rightDrive3 = new WPI_VictorSPX(6);
 
         SpeedControllerGroup left = new SpeedControllerGroup(leftDrive1, leftDrive2, leftDrive3);
@@ -47,13 +51,12 @@ public class Hardware {
 
         hipOne = new VictorSP(0); //Victor 10
         hipTwo = new VictorSP(1); //Victor 8
-        hipTwo.setInverted(true);
         hip = new SpeedControllerGroup(hipOne, hipTwo);
 
-        // Sensors
+        // Sensors 
         pdp = new PowerDistributionPanel(0);
-        leftDriveEncoder = new Encoder(0, 1);
-        rightDriveEncoder = new Encoder(2, 3);
+        leftDriveEncoder = new Encoder(8, 9);
+        rightDriveEncoder = new Encoder(0, 1);
         // gyro = new MPU9250();
 
         /**

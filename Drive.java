@@ -82,26 +82,33 @@ public class Drive extends Subsystem {
     public void updateSpeeds(double _forward, double _turn) {
 
         double forwardChange, turnChange;
+        // if(_turn > 0.0) {
+        //     _turn = Math.pow(_turn, (double)(1/1.4));
+        // } else if(_turn < 0.0) {
+        //     _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
+        // } else { //TODO Test and tune
+        //     double rateDiff = leftDriveEncoder.getRate() + rightDriveEncoder.getRate();
+        //     if(Math.abs(rateDiff) > 10) {
+        //         _turn =  rateDiff / 25.0;
+        //     } 
+        // }
+
         if(_turn > 0.0) {
             _turn = Math.pow(_turn, (double)(1/1.4));
-        } else if(_turn < 0.0) {
+        } else {
             _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
-        } else { //TODO Test and tune
-            double rateDiff = leftDriveEncoder.getRate() + rightDriveEncoder.getRate();
-            if(Math.abs(rateDiff) > 10) {
-                _turn =  rateDiff / 25.0;
-            } 
         }
-        forwardChange = calculateIncrease(_forward, forward);
-        turnChange = calculateIncrease(_turn, turn);
+
+        forwardChange = -calculateIncrease(_forward, forward);
+        turnChange = -calculateIncrease(_turn, turn);
         
         this.forward += forwardChange;
         this.turn += turnChange;
         if (Math.abs(this.forward) > Math.abs(_forward)) {
-            this.forward = _forward;
+            this.forward = -_forward;
         }
         if (Math.abs(this.turn) > Math.abs(_turn)) {
-            this.turn = _turn;
+            this.turn = -_turn;
         }
     }
 
