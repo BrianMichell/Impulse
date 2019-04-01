@@ -26,6 +26,9 @@ public class Robot extends TimedRobot {
     Drive drive;
     Hatch hatch;
 
+    Toggle hatchDisable;
+    Toggle compressorDisable;
+
     @Override
     public void robotInit() {
         driver = new DriverJoystick(0);
@@ -39,8 +42,12 @@ public class Robot extends TimedRobot {
 
         // hw.gyro.calibrateGX();
 
+        hatchDisable = new Toggle();
+        compressorDisable = new Toggle();
+
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
         cam.setResolution(40, 40);
+        cam.setFPS(30);
       }
 
     @Override
@@ -61,6 +68,8 @@ public class Robot extends TimedRobot {
     public void teleopInit(){
         drive.enable();
         hatch.enable();
+        hatchDisable.set(false);
+        compressorDisable.set(true);
     }
 
     @Override
@@ -76,12 +85,30 @@ public class Robot extends TimedRobot {
         //Half speed climb
         boolean sY = secondary.getYButton();
         boolean sX = secondary.getXButton();
+
         double sLT = secondary.getTriggerAxis(GenericHID.Hand.kLeft);
 
+        boolean sRB = secondary.getBumper(GenericHID.Hand.kRight);
 
         // double hip = secondary.getRawAxis(1);
         // climber.manualDrive(hip);
-        hatch.setOpen(dLB);
+
+        hatchDisable.update(sRB);
+
+        compressorDisable.update(sA);
+
+
+        if(!hatchDisable.get()) {
+            hatch.setOpen(dLB);
+        } else {
+            hatch.setOpen(true);
+        }
+
+        if(compressorDisable.get()) {
+            hw.compressor.start();
+        } else {
+            hw.compressor.stop();
+        }
 
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
@@ -90,11 +117,8 @@ public class Robot extends TimedRobot {
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
-        } else if(sA && sB) { //Hold both buttons to begin climb
-            climberSpeed = -1.0;
-            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn())); //Limit driver control to forward only
         } else if(sX && sY) {
-            climberSpeed = -0.5;
+            climberSpeed = -0.8;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()));
         } else {
             drive.setTank(false);
