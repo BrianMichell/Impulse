@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,10 +9,11 @@ public class Drive extends Subsystem {
 
     private final DifferentialDrive drive;
     private final PowerDistributionPanel pdp;
+    private final Encoder leftDriveEncoder;
+    private final Encoder rightDriveEncoder;
 
     private double maxDraw = 0;
     private boolean isTank = false;
-    private final double RATE = 250.0;
 
     public double forward;
     public double turn;
@@ -22,6 +24,8 @@ public class Drive extends Subsystem {
     public Drive(Hardware hw) {
         this.drive = hw.drive;
         this.pdp = hw.pdp;
+        this.leftDriveEncoder = hw.leftDriveEncoder;
+        this.rightDriveEncoder = hw.rightDriveEncoder;
         // this.MOTORS = hw.MOTORS;
         start("Drive");
     }
@@ -75,33 +79,43 @@ public class Drive extends Subsystem {
      * @param _forward The forward/backward power
      * @param _turn    The twist power
      */
-    public void updateSpeeds(double _forward, double _turn, boolean highGear) {
+    public void updateSpeeds(double _forward, double _turn) {
 
         double forwardChange, turnChange;
-        if(_turn >= 0){
+        // if(_turn > 0.0) {
+        //     _turn = Math.pow(_turn, (double)(1/1.4));
+        // } else if(_turn < 0.0) {
+        //     _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
+        // } else { //TODO Test and tune
+        //     double rateDiff = leftDriveEncoder.getRate() + rightDriveEncoder.getRate();
+        //     if(Math.abs(rateDiff) > 10) {
+        //         _turn =  rateDiff / 25.0;
+        //     } 
+        // }
+
+        if(_turn > 0.0) {
             _turn = Math.pow(_turn, (double)(1/1.4));
         } else {
             _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
         }
-        forwardChange = calculateIncrease(_forward, forward, highGear);
-        turnChange = calculateIncrease(_turn, turn, highGear);
+
+        forwardChange = -calculateIncrease(_forward, forward);
+        turnChange = -calculateIncrease(_turn, turn);
         
         this.forward += forwardChange;
         this.turn += turnChange;
         if (Math.abs(this.forward) > Math.abs(_forward)) {
-            this.forward = _forward;
+            this.forward = -_forward;
         }
         if (Math.abs(this.turn) > Math.abs(_turn)) {
-            this.turn = _turn;
+            this.turn = -_turn;
         }
     }
 
-    private double calculateIncrease(double input, double currentOutput, boolean highGear) {
+    //TODO Retest and retune
+    private double calculateIncrease(double input, double currentOutput) {
         int divideFactor = 6;
         double limitedBand = 0.3;
-        if(highGear) {
-            limitedBand += 0.15;
-        }
         if(Math.abs(input) <= limitedBand && Math.abs(currentOutput) <= limitedBand) {
             divideFactor = 11;
         }
@@ -135,18 +149,5 @@ public class Drive extends Subsystem {
     public void setTank(boolean isTank){
         this.isTank = isTank;
     }
-
-    public void calculateTurn(double angleDesired, double currentAngle){
-        this.forward = 0.0;
-        currentAngle %= 360;
-        double desiredPower = (angleDesired - currentAngle) / RATE;
-        desiredPower = normalize(desiredPower, 0.99);
-        this.turn += calculateIncrease(desiredPower, this.turn, false);
-        this.drive.arcadeDrive(0, this.turn);
-    }
-
-    private double normalize(double value, double max) {
-		return Math.max(-max, Math.min(value, max));
-	}
 
 }
