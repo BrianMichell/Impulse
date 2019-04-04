@@ -9,10 +9,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
-// import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 
 public class Robot extends TimedRobot {
@@ -28,6 +29,9 @@ public class Robot extends TimedRobot {
 
     Toggle hatchDisable;
     Toggle compressorDisable;
+    Toggle aggressiveRamp;
+
+    DriverStation ds;
 
     @Override
     public void robotInit() {
@@ -44,10 +48,13 @@ public class Robot extends TimedRobot {
 
         hatchDisable = new Toggle();
         compressorDisable = new Toggle();
+        aggressiveRamp = new Toggle();
 
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
         cam.setResolution(40, 40);
         cam.setFPS(30);
+
+        ds = DriverStation.getInstance();
       }
 
     @Override
@@ -78,6 +85,7 @@ public class Robot extends TimedRobot {
         boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
+        boolean dY = driver.joystick.getYButton();
 
         //Full speed climb
         boolean sA = secondary.getAButton();
@@ -90,12 +98,21 @@ public class Robot extends TimedRobot {
 
         boolean sRB = secondary.getBumper(GenericHID.Hand.kRight);
 
+        double rumbleIntensity = ds.getMatchTime() >= 25 && ds.getMatchTime() <= 30? 1 : 0;
+
+        driver.joystick.setRumble(RumbleType.kRightRumble, rumbleIntensity);
+        driver.joystick.setRumble(RumbleType.kLeftRumble, rumbleIntensity);
+        secondary.setRumble(RumbleType.kRightRumble, rumbleIntensity);
+        secondary.setRumble(RumbleType.kLeftRumble, rumbleIntensity);
+
         // double hip = secondary.getRawAxis(1);
         // climber.manualDrive(hip);
 
         hatchDisable.update(sRB);
 
         compressorDisable.update(sA);
+
+        aggressiveRamp.update(dY);
 
 
         if(!hatchDisable.get()) {
@@ -119,10 +136,10 @@ public class Robot extends TimedRobot {
             drive.oneSideTurn(dLT, dRT);
         } else if(sX && sY) {
             climberSpeed = 0.7;
-            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()));
+            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), aggressiveRamp.get());
         } else {
             drive.setTank(false);
-            drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn());
+            drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn(), aggressiveRamp.get());
         }
 
         if(sLT > 0.3) {
