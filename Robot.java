@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
         } else if(sX && sY) {
-            climberSpeed = -0.8;
+            climberSpeed = 0.7;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()));
         } else {
             drive.setTank(false);
@@ -126,7 +126,7 @@ public class Robot extends TimedRobot {
         }
 
         if(sLT > 0.3) {
-            climberSpeed = sLT/2.0;
+            climberSpeed = -sLT/2.0;
         }
 
         climber.manualDrive(climberSpeed);
