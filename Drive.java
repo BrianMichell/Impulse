@@ -121,7 +121,7 @@ public class Drive extends Subsystem {
         }
         if (overCurrent() || underVoltage()) {
             input *= -1.0;
-            divideFactor *= aggressiveRamp?5:5;
+            divideFactor *= aggressiveRamp?2:2;
         }
         return Math.pow(input, 3) / (double) divideFactor;
     }
