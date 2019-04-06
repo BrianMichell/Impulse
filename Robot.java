@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
 
     Toggle hatchDisable;
     Toggle compressorDisable;
-    Toggle aggressiveRamp;
+    // Toggle aggressiveRamp;
 
     DriverStation ds;
 
@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
 
         hatchDisable = new Toggle();
         compressorDisable = new Toggle();
-        aggressiveRamp = new Toggle();
+        // aggressiveRamp = new Toggle();
 
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
         cam.setResolution(40, 40);
@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
 
         boolean sRB = secondary.getBumper(GenericHID.Hand.kRight);
 
-        double rumbleIntensity = ds.getMatchTime() >= 25 && ds.getMatchTime() <= 30? 1 : 0;
+        double rumbleIntensity = ds.getMatchTime() >= 28 && ds.getMatchTime() <= 30? 0.75 : 0;
 
         driver.joystick.setRumble(RumbleType.kRightRumble, rumbleIntensity);
         driver.joystick.setRumble(RumbleType.kLeftRumble, rumbleIntensity);
@@ -112,7 +112,7 @@ public class Robot extends TimedRobot {
 
         compressorDisable.update(sA);
 
-        aggressiveRamp.update(dY);
+        // aggressiveRamp.update(dY);
 
 
         if(!hatchDisable.get()) {
@@ -135,11 +135,11 @@ public class Robot extends TimedRobot {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
         } else if(sX && sY) {
-            climberSpeed = 0.7;
-            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), aggressiveRamp.get());
+            climberSpeed = 0.60;
+            drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), true);
         } else {
             drive.setTank(false);
-            drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn(), aggressiveRamp.get());
+            drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn(), true);
         }
 
         if(sLT > 0.3) {
