@@ -22,10 +22,12 @@ public class Hatch extends Subsystem {
 
     @Override
     protected void haltSystem(){
+        this.open = false;
+        this.hatchClamp.set(Value.kForward);
     }
 
     private void actuate(){
-        if(open){
+        if(open) {
             this.hatchClamp.set(Value.kReverse);
         } else {
             this.hatchClamp.set(Value.kForward);
