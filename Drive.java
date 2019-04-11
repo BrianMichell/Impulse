@@ -79,7 +79,7 @@ public class Drive extends Subsystem {
      * @param _forward The forward/backward power
      * @param _turn    The twist power
      */
-    public void updateSpeeds(double _forward, double _turn) {
+    public void updateSpeeds(double _forward, double _turn, boolean aggressiveRamp) {
 
         double forwardChange, turnChange;
         // if(_turn > 0.0) {
@@ -99,8 +99,8 @@ public class Drive extends Subsystem {
             _turn = -Math.pow(Math.abs(_turn), (double) (1/1.4));
         }
 
-        forwardChange = -calculateIncrease(_forward, forward);
-        turnChange = -calculateIncrease(_turn, turn);
+        forwardChange = -calculateIncrease(_forward, forward, aggressiveRamp);
+        turnChange = -calculateIncrease(_turn, turn, aggressiveRamp);
         
         this.forward += forwardChange;
         this.turn += turnChange;
@@ -113,15 +113,15 @@ public class Drive extends Subsystem {
     }
 
     //TODO Retest and retune
-    private double calculateIncrease(double input, double currentOutput) {
-        int divideFactor = 6;
+    private double calculateIncrease(double input, double currentOutput, boolean aggressiveRamp) {
+        int divideFactor = aggressiveRamp?6:10;
         double limitedBand = 0.3;
         if(Math.abs(input) <= limitedBand && Math.abs(currentOutput) <= limitedBand) {
-            divideFactor = 11;
+            divideFactor = aggressiveRamp?11:15;
         }
         if (overCurrent() || underVoltage()) {
             input *= -1.0;
-            divideFactor *= 5;
+            divideFactor *= aggressiveRamp?2:2;
         }
         return Math.pow(input, 3) / (double) divideFactor;
     }
