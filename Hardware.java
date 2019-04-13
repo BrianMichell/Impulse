@@ -28,6 +28,7 @@ public class Hardware {
     // public final MPU9250 gyro;
 
     protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
+    private final double DISTANCE_PER_PULSE = Math.PI * 6 / 255;
 
     public Hardware() {
         // Motors
@@ -57,6 +58,8 @@ public class Hardware {
         pdp = new PowerDistributionPanel(0);
         leftDriveEncoder = new Encoder(8, 9);
         rightDriveEncoder = new Encoder(0, 1);
+        leftDriveEncoder.setDistancePerPulse(DISTANCE_PER_PULSE);
+        rightDriveEncoder.setDistancePerPulse(DISTANCE_PER_PULSE);
         // gyro = new MPU9250();
 
         /**
