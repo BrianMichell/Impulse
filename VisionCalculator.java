@@ -18,7 +18,7 @@ class VisionCalculator extends Subsystem{
 
     @Override
     void actions() {
-        double forward = visionGetter.getEncoderDistance() / 55;
+        double forward = encoderDelta(visionGetter.getEncoderDistance())  / 55;
         double turn = visionGetter.getAngle() / 55;
         this.drive.arcadeDrive(forward, turn);
     }
@@ -26,6 +26,10 @@ class VisionCalculator extends Subsystem{
     @Override
     void haltSystem() {
 
+    }
+
+    private double encoderDelta(double targetDist) {
+        return visionGetter.getAngle() > 0.0 ? leftEncoder.getDistance()-targetDist : rightEncoder.getDistance()-targetDist;
     }
 
     
