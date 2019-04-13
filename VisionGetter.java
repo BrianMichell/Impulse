@@ -8,9 +8,9 @@ import edu.wpi.first.networktables.*;
  */
 class VisionGetter {
 
-    NetworkTableInstance inst;
-    NetworkTableEntry dist;
-    NetworkTableEntry angle;
+    private NetworkTableInstance inst;
+    private NetworkTableEntry dist;
+    private NetworkTableEntry angle;
 
     public VisionGetter() {
         inst = NetworkTableInstance.getDefault();
