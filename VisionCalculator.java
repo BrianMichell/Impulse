@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
-class VisionCalculator extends Subsystem{
+class VisionCalculator extends Subsystem {
 
     private DifferentialDrive drive;
     private VisionGetter visionGetter;
@@ -20,18 +20,18 @@ class VisionCalculator extends Subsystem{
 
     @Override
     void actions() {
-        double forward = encoderDelta(visionGetter.getEncoderDistance())  / 55;
+        double forward = encoderDelta(visionGetter.getEncoderDistance()) / 55;
         double turn = gyroDelta(visionGetter.getAngle()) / 55;
         this.drive.arcadeDrive(forward, turn);
     }
 
     @Override
     void haltSystem() {
-
+        // Do nothing
     }
 
     private double encoderDelta(double targetDist) {
-        return visionGetter.getAngle() > 0.0 ? leftEncoder.getDistance()-targetDist : rightEncoder.getDistance()-targetDist;
+        return visionGetter.getAngle() > 0.0 ? leftEncoder.getDistance() - targetDist : rightEncoder.getDistance() - targetDist;
     }
 
     private double gyroDelta(double targetAngle) {
