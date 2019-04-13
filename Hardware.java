@@ -15,11 +15,8 @@ public class Hardware {
     private final WPI_VictorSPX leftDrive1, leftDrive2, leftDrive3, rightDrive1, rightDrive2, rightDrive3;
     public final DifferentialDrive drive;
     private final VictorSP hipOne, hipTwo;
+    public final VictorSP intakeOne, intakeTwo;
     public final SpeedControllerGroup hip;
-
-    // Pneumatics
-    public final Compressor compressor = new Compressor();
-    public final DoubleSolenoid hatchClamp = new DoubleSolenoid(3, 4);
 
     // Sensors
     public final PowerDistributionPanel pdp;
@@ -53,6 +50,9 @@ public class Hardware {
         hipOne = new VictorSP(0); //Victor 10
         hipTwo = new VictorSP(1); //Victor 8
         hip = new SpeedControllerGroup(hipOne, hipTwo);
+
+        intakeOne = new VictorSP(2);
+        intakeTwo = new VictorSP(3);
 
         // Sensors 
         pdp = new PowerDistributionPanel(0);
