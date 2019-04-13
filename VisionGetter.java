@@ -27,21 +27,21 @@ class VisionGetter {
         lastOffset = 0.0;
     }
 
-    public double getDistance() {
+    private double getDistance() {
         double distance = 0;
         distance = dist.getDouble(distance);
         lastDistance = distance != 0.0 ? distance : lastDistance; // Only updates last distance if a target was found
         return distance;
     }
 
-    public double getAngle() {
+    private double getAngle() {
         double ang = 0.0;
         ang = angle.getDouble(ang);
         lastAngle = ang != 0.0 ? ang : lastAngle;
         return ang;
     }
 
-    public double getOffset() {
+    private double getOffset() {
         double reportedOffset = 0.0;
         reportedOffset = offset.getDouble(reportedOffset);
         lastOffset = reportedOffset != 0.0 ? reportedOffset : lastOffset;
@@ -49,14 +49,17 @@ class VisionGetter {
     }
 
     public double getEncoderDistance() {
+        getDistance();
         return lastDistance;
     }
 
     public double getGyroAngle() {
+        getAngle();
         return lastAngle;
     }
 
     public double getOffsetDistance() {
+        getOffset();
         return lastOffset;
     }
 

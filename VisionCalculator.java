@@ -21,7 +21,7 @@ class VisionCalculator extends Subsystem {
     @Override
     void actions() {
         double forward = encoderDelta(visionGetter.getEncoderDistance()) / 55;
-        double turn = gyroDelta(visionGetter.getAngle()) / 55;
+        double turn = gyroDelta(visionGetter.getGyroAngle()) / 55;
         this.drive.arcadeDrive(forward, turn);
     }
 
@@ -31,12 +31,12 @@ class VisionCalculator extends Subsystem {
     }
 
     private double encoderDelta(double targetDist) {
-        double dist = Math.sqrt(Math.pow(visionGetter.getOffset(), 2) + Math.pow(targetDist, 2)); // Actual distance to be driven
-        return visionGetter.getAngle() > 0.0 ? leftEncoder.getDistance() - dist : rightEncoder.getDistance() - dist;
+        double dist = Math.sqrt(Math.pow(visionGetter.getOffsetDistance(), 2) + Math.pow(targetDist, 2)); // Actual distance to be driven
+        return visionGetter.getGyroAngle() > 0.0 ? leftEncoder.getDistance() - dist : rightEncoder.getDistance() - dist;
     }
 
     private double gyroDelta(double targetAngle) {
-        return this.gyro.getGyroX() - targetAngle;
+        return this.gyro.getGyroX() - targetAngle - visionGetter.getOffsetDistance();
     }
 
     
