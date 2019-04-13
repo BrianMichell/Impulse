@@ -27,6 +27,8 @@ public class Robot extends TimedRobot {
     Drive drive;
     Hatch hatch;
 
+    VisionCalculator vision;
+
     Toggle hatchDisable;
     Toggle compressorDisable;
     // Toggle aggressiveRamp;
@@ -43,6 +45,8 @@ public class Robot extends TimedRobot {
         climber = new Climber(hw);
         drive = new Drive(hw);
         hatch = new Hatch(hw);
+
+        vision = new VisionCalculator(hw, new VisionGetter());
 
         // hw.gyro.calibrateGX();
 
@@ -86,6 +90,7 @@ public class Robot extends TimedRobot {
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
         boolean dY = driver.joystick.getYButton();
+        boolean dX = driver.joystick.getXButton();
 
         //Full speed climb
         boolean sA = secondary.getAButton();
@@ -134,10 +139,15 @@ public class Robot extends TimedRobot {
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
+            vision.disable();
+        } else if(dX) {
+            vision.enable();
         } else if(sX && sY) {
+            vision.disable();
             climberSpeed = 0.60;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), true);
         } else {
+            vision.disable();
             drive.setTank(false);
             drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn(), true);
         }
