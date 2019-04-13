@@ -18,10 +18,8 @@ class VisionCalculator extends Subsystem{
 
     @Override
     void actions() {
-        double forward = 0.0;
-        double turn = 0.0;
-        forward = visionGetter.getDistance() / 55;
-        turn = visionGetter.getAngle() / 55;
+        double forward = visionGetter.getEncoderDistance() / 55;
+        double turn = visionGetter.getAngle() / 55;
         this.drive.arcadeDrive(forward, turn);
     }
 
