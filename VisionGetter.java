@@ -12,6 +12,7 @@ class VisionGetter {
     private NetworkTableEntry dist;
     private NetworkTableEntry angle;
     private double lastDistance;
+    private double lastAngle;
 
     public VisionGetter() {
         inst = NetworkTableInstance.getDefault();
@@ -19,6 +20,7 @@ class VisionGetter {
         dist = table.getEntry("x");
         angle = table.getEntry("Angle");
         lastDistance = 0.0;
+        lastAngle = 0.0;
     }
 
     public double getDistance() {
@@ -31,11 +33,16 @@ class VisionGetter {
     public double getAngle() {
         double ang = 0.0;
         ang = angle.getDouble(ang);
+        lastAngle = ang != 0.0 ? ang : lastAngle;
         return ang;
     }
 
     public double getEncoderDistance() {
         return lastDistance;
+    }
+
+    public double getGyroAngle() {
+        return lastAngle;
     }
 
 }
