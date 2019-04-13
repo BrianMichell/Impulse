@@ -25,7 +25,7 @@ public class Hardware {
     public final PowerDistributionPanel pdp;
     public final Encoder leftDriveEncoder;
     public final Encoder rightDriveEncoder;
-    // public final MPU9250 gyro;
+    public final MPU9250 gyro;
 
     protected final int[] MOTORS = { 0, 1, 2, 15, 14, 13 };
     private final double DISTANCE_PER_PULSE = Math.PI * 6 / 255;
@@ -60,7 +60,7 @@ public class Hardware {
         rightDriveEncoder = new Encoder(0, 1);
         leftDriveEncoder.setDistancePerPulse(DISTANCE_PER_PULSE);
         rightDriveEncoder.setDistancePerPulse(DISTANCE_PER_PULSE);
-        // gyro = new MPU9250();
+        gyro = new MPU9250();
 
         /**
          * Victor 9 = PWM 2
