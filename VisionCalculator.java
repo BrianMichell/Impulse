@@ -31,7 +31,8 @@ class VisionCalculator extends Subsystem {
     }
 
     private double encoderDelta(double targetDist) {
-        return visionGetter.getAngle() > 0.0 ? leftEncoder.getDistance() - targetDist : rightEncoder.getDistance() - targetDist;
+        double dist = Math.sqrt(Math.pow(visionGetter.getOffset(), 2) + Math.pow(targetDist, 2)); // Actual distance to be driven
+        return visionGetter.getAngle() > 0.0 ? leftEncoder.getDistance() - dist : rightEncoder.getDistance() - dist;
     }
 
     private double gyroDelta(double targetAngle) {
