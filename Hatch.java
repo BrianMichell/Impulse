@@ -1,41 +1,19 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.VictorSP;
 
-public class Hatch extends Subsystem {
+public class Hatch {
 
-    private DoubleSolenoid hatchClamp;
-    private boolean open;
-    
-    public Hatch(Hardware hw){
-        this.hatchClamp = hw.hatchClamp;
-        this.open = true;
+    private VictorSP intakeOne, intakeTwo;
 
-        start("Hatch");
+    public Hatch(Hardware hw) {
+        this.intakeOne = hw.intakeOne;
+        this.intakeTwo = hw.intakeTwo;
     }
 
-    @Override
-    protected void actions(){
-        actuate();
-    }
-
-    @Override
-    protected void haltSystem() {
-        // this.open = false;
-        // this.hatchClamp.set(Value.kForward);
-    }
-
-    private void actuate(){
-        if(open) {
-            this.hatchClamp.set(Value.kReverse);
-        } else {
-            this.hatchClamp.set(Value.kForward);
-        }
-    }
-
-    public void setOpen(boolean value){
-        open = !value;
+    public void setSpeed(double speed) {
+        this.intakeOne.setSpeed(speed);
+        this.intakeTwo.setSpeed(-speed);
     }
 
 }

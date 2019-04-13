@@ -29,8 +29,6 @@ public class Robot extends TimedRobot {
 
     VisionCalculator vision;
 
-    Toggle hatchDisable;
-    Toggle compressorDisable;
     // Toggle aggressiveRamp;
 
     DriverStation ds;
@@ -50,8 +48,6 @@ public class Robot extends TimedRobot {
 
         // hw.gyro.calibrateGX();
 
-        hatchDisable = new Toggle();
-        compressorDisable = new Toggle();
         // aggressiveRamp = new Toggle();
 
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
@@ -78,24 +74,19 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit(){
         drive.enable();
-        hatch.enable();
-        hatchDisable.set(false);
-        compressorDisable.set(true);
     }
 
     @Override
     public void teleopPeriodic() {
         //Collect all joystick inputs
         boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
+        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
         double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
         double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
         boolean dY = driver.joystick.getYButton();
         boolean dX = driver.joystick.getXButton();
 
         //Full speed climb
-        boolean sA = secondary.getAButton();
-        boolean sB = secondary.getBButton();
-        //Half speed climb
         boolean sY = secondary.getYButton();
         boolean sX = secondary.getXButton();
 
@@ -113,28 +104,12 @@ public class Robot extends TimedRobot {
         // double hip = secondary.getRawAxis(1);
         // climber.manualDrive(hip);
 
-        hatchDisable.update(sRB);
-
-        compressorDisable.update(sA);
-
         // aggressiveRamp.update(dY);
-
-
-        if(!hatchDisable.get()) {
-            hatch.setOpen(dLB);
-        } else {
-            hatch.setOpen(true);
-        }
-
-        if(compressorDisable.get()) {
-            hw.compressor.start();
-        } else {
-            hw.compressor.stop();
-        }
 
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
         double climberSpeed = 0.0;
+        double intakeSpeed = 0.0;
 
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
@@ -156,6 +131,14 @@ public class Robot extends TimedRobot {
             climberSpeed = -sLT/2.0;
         }
 
+        if(dLB) {
+            intakeSpeed = -1.0;
+        }
+        if(dRB) {
+            intakeSpeed = 1.0;
+        }
+
+        hatch.setSpeed(intakeSpeed);
         climber.manualDrive(climberSpeed);
 
     }
@@ -167,6 +150,6 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic(){
         drive.disable();
-        hatch.disable();
+        vision.disable();
     }
 }
