@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 class VisionCalculator extends Subsystem {
 
+    private final double FORWARD = 55.0;
+    private final double TURN = 55.0;
+
     private DifferentialDrive drive;
     private VisionGetter visionGetter;
     private Encoder leftEncoder, rightEncoder;
@@ -20,8 +23,8 @@ class VisionCalculator extends Subsystem {
 
     @Override
     void actions() {
-        double forward = encoderDelta(visionGetter.getEncoderDistance()) / 55;
-        double turn = gyroDelta(visionGetter.getGyroAngle()) / 55;
+        double forward = encoderDelta(visionGetter.getEncoderDistance()) / FORWARD;
+        double turn = gyroDelta(visionGetter.getGyroAngle()) / TURN;
         this.drive.arcadeDrive(forward, turn);
     }
 
