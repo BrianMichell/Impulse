@@ -27,8 +27,8 @@ public class Robot extends TimedRobot {
     Drive drive;
     Hatch hatch;
 
-    Toggle hatchDisable;
-    Toggle compressorDisable;
+    // VisionCalculator vision;
+
     // Toggle aggressiveRamp;
 
     DriverStation ds;
@@ -44,10 +44,10 @@ public class Robot extends TimedRobot {
         drive = new Drive(hw);
         hatch = new Hatch(hw);
 
+        // vision = new VisionCalculator(hw, new VisionGetter());
+
         // hw.gyro.calibrateGX();
 
-        hatchDisable = new Toggle();
-        compressorDisable = new Toggle();
         // aggressiveRamp = new Toggle();
 
         UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
@@ -74,31 +74,30 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit(){
         drive.enable();
-        hatch.enable();
-        hatchDisable.set(false);
-        compressorDisable.set(true);
     }
 
     @Override
     public void teleopPeriodic() {
-        //Collect all joystick inputs
-        boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
-        double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
-        double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
-        boolean dY = driver.joystick.getYButton();
 
-        //Full speed climb
-        boolean sA = secondary.getAButton();
-        boolean sB = secondary.getBButton();
-        //Half speed climb
+        double matchTime = ds.getMatchTime();
+
+        //Collect all joystick inputs
+        boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft); // Outtake
+        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight); // Intake
+        double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight); // Controlled turn right
+        double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft); // Controlled turn left
+        boolean dY = driver.joystick.getYButton(); // Switch ramping modes
+        boolean dX = driver.joystick.getXButton(); // Start using vision mode
+
+        //Climb
         boolean sY = secondary.getYButton();
         boolean sX = secondary.getXButton();
 
-        double sLT = secondary.getTriggerAxis(GenericHID.Hand.kLeft);
+        double sLT = secondary.getTriggerAxis(GenericHID.Hand.kLeft); // Climber reverse
 
         boolean sRB = secondary.getBumper(GenericHID.Hand.kRight);
 
-        double rumbleIntensity = ds.getMatchTime() >= 28 && ds.getMatchTime() <= 30? 0.75 : 0;
+        double rumbleIntensity = matchTime >= 28 && ds.getMatchTime() <= 30? 0.75 : 0;
 
         driver.joystick.setRumble(RumbleType.kRightRumble, rumbleIntensity);
         driver.joystick.setRumble(RumbleType.kLeftRumble, rumbleIntensity);
@@ -108,45 +107,50 @@ public class Robot extends TimedRobot {
         // double hip = secondary.getRawAxis(1);
         // climber.manualDrive(hip);
 
-        hatchDisable.update(sRB);
-
-        compressorDisable.update(sA);
-
         // aggressiveRamp.update(dY);
-
-
-        if(!hatchDisable.get()) {
-            hatch.setOpen(dLB);
-        } else {
-            hatch.setOpen(true);
-        }
-
-        if(compressorDisable.get()) {
-            hw.compressor.start();
-        } else {
-            hw.compressor.stop();
-        }
 
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
-        double climberSpeed = 0.0;
+        double climberSpeed = matchTime >= 15? -0.2 : 0.0;
+        double intakeSpeed = matchTime >= 135? 0.1 : 0.0;
+        // double intakeSpeed = 0.1;
 
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
+            // vision.disable();
+        } else if(dX) {
+            // vision.enable();
         } else if(sX && sY) {
-            climberSpeed = 0.60;
+            // vision.disable();
+            climberSpeed = 0.90;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), true);
         } else {
+            // vision.disable();
             drive.setTank(false);
-            drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn(), true);
+            double forward = -DriverJoystick.getForward();
+            double turn = -DriverJoystick.getTurn();
+            if(matchTime >= 140) {
+                forward *= 0.5;
+                turn *= 0.5;
+            }
+            drive.updateSpeeds(forward, turn, true);
         }
 
         if(sLT > 0.3) {
             climberSpeed = -sLT/2.0;
         }
 
+        if(dLB) {
+            intakeSpeed = -1.0;
+        }
+        if(dRB) {
+            intakeSpeed = 1.0;
+        }
+
+        hatch.setSpeed(intakeSpeed);
         climber.manualDrive(climberSpeed);
+
 
     }
 
@@ -157,6 +161,6 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic(){
         drive.disable();
-        hatch.disable();
+        // vision.disable();
     }
 }
