@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
     Drive drive;
     Hatch hatch;
 
-    VisionCalculator vision;
+    // VisionCalculator vision;
 
     // Toggle aggressiveRamp;
 
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
         drive = new Drive(hw);
         hatch = new Hatch(hw);
 
-        vision = new VisionCalculator(hw, new VisionGetter());
+        // vision = new VisionCalculator(hw, new VisionGetter());
 
         // hw.gyro.calibrateGX();
 
@@ -78,23 +78,26 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        //Collect all joystick inputs
-        boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft);
-        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight);
-        double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight);
-        double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft);
-        boolean dY = driver.joystick.getYButton();
-        boolean dX = driver.joystick.getXButton();
 
-        //Full speed climb
+        double matchTime = ds.getMatchTime();
+
+        //Collect all joystick inputs
+        boolean dLB = driver.joystick.getBumper(GenericHID.Hand.kLeft); // Outtake
+        boolean dRB = driver.joystick.getBumper(GenericHID.Hand.kRight); // Intake
+        double dRT = driver.joystick.getTriggerAxis(GenericHID.Hand.kRight); // Controlled turn right
+        double dLT = driver.joystick.getTriggerAxis(GenericHID.Hand.kLeft); // Controlled turn left
+        boolean dY = driver.joystick.getYButton(); // Switch ramping modes
+        boolean dX = driver.joystick.getXButton(); // Start using vision mode
+
+        //Climb
         boolean sY = secondary.getYButton();
         boolean sX = secondary.getXButton();
 
-        double sLT = secondary.getTriggerAxis(GenericHID.Hand.kLeft);
+        double sLT = secondary.getTriggerAxis(GenericHID.Hand.kLeft); // Climber reverse
 
         boolean sRB = secondary.getBumper(GenericHID.Hand.kRight);
 
-        double rumbleIntensity = ds.getMatchTime() >= 28 && ds.getMatchTime() <= 30? 0.75 : 0;
+        double rumbleIntensity = matchTime >= 28 && ds.getMatchTime() <= 30? 0.75 : 0;
 
         driver.joystick.setRumble(RumbleType.kRightRumble, rumbleIntensity);
         driver.joystick.setRumble(RumbleType.kLeftRumble, rumbleIntensity);
@@ -108,23 +111,30 @@ public class Robot extends TimedRobot {
 
         // SmartDashboard.putNumber("Gyro", hw.gyro.getGyroX());
 
-        double climberSpeed = 0.0;
-        double intakeSpeed = 0.0;
+        double climberSpeed = matchTime >= 15? -0.2 : 0.0;
+        double intakeSpeed = matchTime >= 135? 0.1 : 0.0;
+        // double intakeSpeed = 0.1;
 
         if(dRT > 0.2 || dLT > 0.2) {
             drive.setTank(true);
             drive.oneSideTurn(dLT, dRT);
-            vision.disable();
+            // vision.disable();
         } else if(dX) {
-            vision.enable();
+            // vision.enable();
         } else if(sX && sY) {
-            vision.disable();
-            climberSpeed = 0.60;
+            // vision.disable();
+            climberSpeed = 0.90;
             drive.updateSpeeds(-Math.abs(DriverJoystick.getForward()), -Math.abs(DriverJoystick.getTurn()), true);
         } else {
-            vision.disable();
+            // vision.disable();
             drive.setTank(false);
-            drive.updateSpeeds(-DriverJoystick.getForward(), -DriverJoystick.getTurn(), true);
+            double forward = -DriverJoystick.getForward();
+            double turn = -DriverJoystick.getTurn();
+            if(matchTime >= 140) {
+                forward *= 0.5;
+                turn *= 0.5;
+            }
+            drive.updateSpeeds(forward, turn, true);
         }
 
         if(sLT > 0.3) {
@@ -141,6 +151,7 @@ public class Robot extends TimedRobot {
         hatch.setSpeed(intakeSpeed);
         climber.manualDrive(climberSpeed);
 
+
     }
 
     @Override
@@ -150,6 +161,6 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic(){
         drive.disable();
-        vision.disable();
+        // vision.disable();
     }
 }
