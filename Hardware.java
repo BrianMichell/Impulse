@@ -3,8 +3,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.VictorSP;
 import com.ctre.phoenix.motorcontrol.can.*;
@@ -29,12 +27,6 @@ public class Hardware {
 
     public Hardware() {
         // Motors
-        // leftDrive1 = new WPI_VictorSPX(1);
-        // leftDrive2 = new WPI_VictorSPX(2);
-        // leftDrive3 = new WPI_VictorSPX(3);
-        // rightDrive1 = new WPI_VictorSPX(4);
-        // rightDrive2 = new WPI_VictorSPX(5);
-        // rightDrive3 = new WPI_VictorSPX(6);
         leftDrive1 = new WPI_VictorSPX(1);
         leftDrive2 = new WPI_VictorSPX(5);
         leftDrive3 = new WPI_VictorSPX(4);
@@ -50,9 +42,10 @@ public class Hardware {
         hipOne = new VictorSP(0); //Victor 10
         hipTwo = new VictorSP(1); //Victor 8
         hip = new SpeedControllerGroup(hipOne, hipTwo);
+        hip.setInverted(true);
 
-        intakeOne = new VictorSP(2);
-        intakeTwo = new VictorSP(3);
+        intakeOne = new VictorSP(8);
+        intakeTwo = new VictorSP(9);
 
         // Sensors 
         pdp = new PowerDistributionPanel(0);
